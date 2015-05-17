@@ -14,7 +14,7 @@ Got some JSON you want to build into a model and test?
 
 It can be pretty tedious writing all of that code. Instead, why not generate the assert* code automatically? I've been writing code manually for a while now and finally decided to build something to write that boilerplate code for me.
 
-I've put up a [live version](http://java-json-test-writer.herokuapp.com) for anyone to use, as well as [open-sourced it on GitHub](http://github.com/dallasgutauckis/java-json-test-writer). Let me know what you think!
+I've put up a [live version](http://json-java-test-writer.herokuapp.com) for anyone to use, as well as [open-sourced it on GitHub](http://github.com/dallasgutauckis/java-json-test-writer). Let me know what you think!
 
 Here's some JSON to test with:
 
