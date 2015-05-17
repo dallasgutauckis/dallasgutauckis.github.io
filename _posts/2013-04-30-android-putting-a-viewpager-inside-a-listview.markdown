@@ -102,7 +102,7 @@ There are a few ways to try to handle this.
 2.  You can set a touch listener on the `ListView` and try to delegate the touches based on which view you think needs to get the touches and what actions need to occur based on those touches.
 3.  You can also combine a touch listener with GestureDetector to try to make the implementation a little less cumbersome. The problem is that in some ListViews, our layouts are a little more complex than single item rows of text. If the item layout has for instance a Button, we'd then need to properly delegate the touch event down to the Button. This obviously has huge ramifications for implementation and testing.
 
-In order to avoid the aforementioned shenanigans, I added an `[OnPageChangeListener](http://developer.android.com/reference/android/support/v4/view/ViewPager.OnPageChangeListener.html)` to the `ViewPager` and based on the state of the pager, forced a touch delegate from the `Activity`.
+In order to avoid the aforementioned shenanigans, I added an [`OnPageChangeListener`](http://developer.android.com/reference/android/support/v4/view/ViewPager.OnPageChangeListener.html) to the `ViewPager` and based on the state of the pager, forced a touch delegate from the `Activity`.
 
 Contrived example:
 

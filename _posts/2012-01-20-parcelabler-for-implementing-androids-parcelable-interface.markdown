@@ -82,9 +82,9 @@ comments:
 
 **[Update 2014-09-02]**: Since this original post, a plugin has been made for Android Studio/IntelliJ by Michał Charmas with contributions from me as well. See [android-parcelable-intellij-plugin](https://github.com/mcharmas/android-parcelable-intellij-plugin) for installation instructions.
 
-I have created a tool for making the methods needed for implementation of Android's [Parcelable](http://developer.android.com/reference/android/os/Parcelable.html "Parcelable") interface within a pre-existing class.
+I have created a tool for making the methods needed for implementation of Android's [Parcelable](http://developer.android.com/reference/android/os/Parcelable.html) interface within a pre-existing class.
 
-0.  Open the [parcelabler tool](http://devk.it/proj/parcelabler.php).
+0.  Open the [parcelabler tool](http://parcelabler.com).
 0.  Copy the full code of the class into the "Code" text field.  
      Example code:  
 

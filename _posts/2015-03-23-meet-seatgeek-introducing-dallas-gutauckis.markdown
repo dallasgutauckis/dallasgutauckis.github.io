@@ -10,6 +10,4 @@ tags: []
 comments: []
 ---
 
-![](/assets/dallas_620.jpg)
-
 I just got featured in an interview for culture at SeatGeek by way of ChairNerd, SeatGeek's blog around general site news, development, culture, and product. [Check it out](http://chairnerd.seatgeek.com/meet-seatgeek-introducing-dallas-gutauckis/).
