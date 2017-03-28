@@ -1,0 +1,54 @@
+==================================================================
+https://keybase.io/dallas
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of http://dallasgutauckis.com
+  * I am dallas (https://keybase.io/dallas) on keybase.
+  * I have a public key ASAI04Tsq9kfwAmw-nqpi0E4FIXuhNTKLHC5RQiq912Uhwo
+
+To do so, I am signing this object:
+
+{
+    "body": {
+        "key": {
+            "eldest_kid": "0101a72db1318bcf909bb748a26330d3f8aa69f9e5f785b697ea5debdb9c0d24129a0a",
+            "host": "keybase.io",
+            "kid": "012008d384ecabd91fc009b0fa7aa98b41381485ee84d4ca2c70b94508aaf75d94870a",
+            "uid": "f6779027be99b9cae92932823f879600",
+            "username": "dallas"
+        },
+        "service": {
+            "hostname": "dallasgutauckis.com",
+            "protocol": "http:"
+        },
+        "type": "web_service_binding",
+        "version": 1
+    },
+    "client": {
+        "name": "keybase.io go client",
+        "version": "1.0.20"
+    },
+    "ctime": 1490645234,
+    "expire_in": 504576000,
+    "merkle_root": {
+        "ctime": 1490645214,
+        "hash": "f28598d1302f822825a99477e2cdeacf143762e432941bfd9f846e560a9d68b02ff7762ed7ae04b5d9c607492bbec0dce563acd7278d19f6ffceacd16b3b39c2",
+        "seqno": 980999
+    },
+    "prev": "c8f15afc491fad11e24ab10f1a30adfcbcdd9b4f250a04b0d601aa5dbd7b9a37",
+    "seqno": 31,
+    "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgCNOE7KvZH8AJsPp6qYtBOBSF7oTUyixwuUUIqvddlIcKp3BheWxvYWTFAvl7ImJvZHkiOnsia2V5Ijp7ImVsZGVzdF9raWQiOiIwMTAxYTcyZGIxMzE4YmNmOTA5YmI3NDhhMjYzMzBkM2Y4YWE2OWY5ZTVmNzg1YjY5N2VhNWRlYmRiOWMwZDI0MTI5YTBhIiwiaG9zdCI6ImtleWJhc2UuaW8iLCJraWQiOiIwMTIwMDhkMzg0ZWNhYmQ5MWZjMDA5YjBmYTdhYTk4YjQxMzgxNDg1ZWU4NGQ0Y2EyYzcwYjk0NTA4YWFmNzVkOTQ4NzBhIiwidWlkIjoiZjY3NzkwMjdiZTk5YjljYWU5MjkzMjgyM2Y4Nzk2MDAiLCJ1c2VybmFtZSI6ImRhbGxhcyJ9LCJzZXJ2aWNlIjp7Imhvc3RuYW1lIjoiZGFsbGFzZ3V0YXVja2lzLmNvbSIsInByb3RvY29sIjoiaHR0cDoifSwidHlwZSI6IndlYl9zZXJ2aWNlX2JpbmRpbmciLCJ2ZXJzaW9uIjoxfSwiY2xpZW50Ijp7Im5hbWUiOiJrZXliYXNlLmlvIGdvIGNsaWVudCIsInZlcnNpb24iOiIxLjAuMjAifSwiY3RpbWUiOjE0OTA2NDUyMzQsImV4cGlyZV9pbiI6NTA0NTc2MDAwLCJtZXJrbGVfcm9vdCI6eyJjdGltZSI6MTQ5MDY0NTIxNCwiaGFzaCI6ImYyODU5OGQxMzAyZjgyMjgyNWE5OTQ3N2UyY2RlYWNmMTQzNzYyZTQzMjk0MWJmZDlmODQ2ZTU2MGE5ZDY4YjAyZmY3NzYyZWQ3YWUwNGI1ZDljNjA3NDkyYmJlYzBkY2U1NjNhY2Q3Mjc4ZDE5ZjZmZmNlYWNkMTZiM2IzOWMyIiwic2Vxbm8iOjk4MDk5OX0sInByZXYiOiJjOGYxNWFmYzQ5MWZhZDExZTI0YWIxMGYxYTMwYWRmY2JjZGQ5YjRmMjUwYTA0YjBkNjAxYWE1ZGJkN2I5YTM3Iiwic2Vxbm8iOjMxLCJ0YWciOiJzaWduYXR1cmUifaNzaWfEQF2+nsc4Zi2hhkBoskpB4DPe/DU8rgF7fgW3oxJj2GIK2TswwLEP3+RiuLYNk14Hx8k46x4X4B9QUVC5UFKNVwCoc2lnX3R5cGUgpGhhc2iCpHR5cGUIpXZhbHVlxCCtmbK8tWxn+7jef75WyVJXFp3Ogs+sgAclDNDEWKqouqN0YWfNAgKndmVyc2lvbgE=
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/dallas
+
+==================================================================
