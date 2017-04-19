@@ -11,9 +11,9 @@ comments: []
 ---
 ![Dallas Gutauckis (that's me!)](/assets/dallas_620.jpg)
 
-I'm a programmer by profession as well as passion.
+I'm a programmer by profession as well as by passion.
 
-I'm the lead Android engineer at SeatGeek. I particularly enjoy making engaging, thoughtful–sometimes even whimsical–experiences for Android users.
+I am the Mobile Engineering Lead at [SeatGeek](https://seatgeek.com), mostly working to improve our products, engineering processes, and helping people grow.
 
 As a matter of hobby I tend to enjoy photography, biking, and hockey.
 
@@ -23,3 +23,4 @@ As a matter of hobby I tend to enjoy photography, biking, and hockey.
  * [Github (dallasgutauckis)](https://github.com/dallasgutauckis)
  * [Twitter (dallasgutauckis)](https://twitter.com/dallasgutauckis)
  * [LinkedIn(dallasgutauckis)](http://www.linkedin.com/in/dallasgutauckis)
+ * [Keybase (dallas)](https://keybase.io/dallas)
