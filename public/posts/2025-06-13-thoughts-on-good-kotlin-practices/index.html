@@ -145,7 +145,7 @@ like Pair, Triple, or when splitting a string, e.g.">
     <h1 class="post-title entry-hint-parent">
       Thoughts on good Kotlin practices
     </h1>
-    <div class="post-meta"><span title='2025-06-13 00:00:00 +0000 UTC'>June 13, 2025</span>&nbsp;·&nbsp;4 min&nbsp;·&nbsp;776 words
+    <div class="post-meta"><span title='2025-06-13 00:00:00 +0000 UTC'>June 13, 2025</span>&nbsp;·&nbsp;4 min&nbsp;·&nbsp;794 words
 
 </div>
   </header> 
@@ -206,8 +206,11 @@ Prefer keeping them close to where they&rsquo;re used (e.g. in the same file or 
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">is</span> <span style="color:#a6e22e">UiState</span>.Loading <span style="color:#f92672">-&gt;</span> showLoading()
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">is</span> <span style="color:#a6e22e">UiState</span>.Error <span style="color:#f92672">-&gt;</span> showError(state.reason)
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">is</span> <span style="color:#a6e22e">UiState</span>.Success <span style="color:#f92672">-&gt;</span> showData(state.<span style="color:#66d9ef">data</span>)
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// No &#39;else&#39; needed if all cases are covered
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// don&#39;t use `else` here so we can easily find cases we need to handle if we add a new UiState
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">is</span> <span style="color:#a6e22e">UiState</span>.Unauthenticated,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">is</span> <span style="color:#a6e22e">UiState</span>.NetworkFailure <span style="color:#f92672">-&gt;</span> showRetry()
+</span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>If you add a new subclass to <code>UiState</code>, the compiler will alert you to update all relevant <code>when</code> statements. This helps prevent subtle bugs and ensures your code stays robust as your models evolve.</p>
 
 

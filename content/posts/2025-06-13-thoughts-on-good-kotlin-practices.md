@@ -109,7 +109,10 @@ when (state) {
     is UiState.Loading -> showLoading()
     is UiState.Error -> showError(state.reason)
     is UiState.Success -> showData(state.data)
-    // No 'else' needed if all cases are covered
+
+    // don't use `else` here so we can easily find cases we need to handle if we add a new UiState
+    is UiState.Unauthenticated,
+    is UiState.NetworkFailure -> showRetry()
 }
 ```
 
