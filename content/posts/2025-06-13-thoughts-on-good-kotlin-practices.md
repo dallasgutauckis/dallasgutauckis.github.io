@@ -22,7 +22,7 @@ val input = "userId=42"
 val (key, value) = input.split("=")
 ```
 
-When you destructure something like `val (a, b, c) = someData`, it’s no longer obvious what `a`, `b`, or `c` actually represent without jumping back to the class definition. 
+When you destructure something like `val (a, b, c) = someData`, it's no longer obvious what `a`, `b`, or `c` actually represent without jumping back to the class definition. 
 This hurts readability and can lead to subtle bugs if fields are ever reordered or misunderstood.
 
 Instead, prefer using named accessors (`someData.foo`) unless destructuring truly enhances clarity and is immediately obvious from context.
@@ -43,13 +43,13 @@ This approach helps prevent invalid combinations of state (like showing both a s
 
 ### Use `object`/`data object`, not `class`…
 
-You’ll often see people reach for `class` when they really mean `object`, especially for singleton values. There’s a [widely shared article](https://medium.com/android-news/memory-efficiency-with-sealed-object-d7941ce8a66c) that argues for using `object` on the basis of memory efficiency — but that’s largely a red herring.
+You'll often see people reach for `class` when they really mean `object`, especially for singleton values. There's a [widely shared article](https://medium.com/android-news/memory-efficiency-with-sealed-object-d7941ce8a66c) that argues for using `object` on the basis of memory efficiency — but that's largely a red herring.
 
-In practice, the memory savings are negligible. The real value in using `object` or `data object` (as of Kotlin 1.9) is **clarity of intent**: if something doesn’t carry instance-specific data and doesn’t need to be instantiated multiple times, it *shouldn’t* be a class.
+In practice, the memory savings are negligible. The real value in using `object` or `data object` (as of Kotlin 1.9) is **clarity of intent**: if something doesn't carry instance-specific data and doesn't need to be instantiated multiple times, it *shouldn't* be a class.
 
 This makes your code easier to reason about. Using `object` reduces boilerplate and makes exhaustive `when` statements cleaner and more reliable, since there's no ambiguity around instantiation or equality.
 
-It’s not about saving memory — it’s about making your code harder to misuse and easier to understand.
+It's not about saving memory — it's about making your code harder to misuse and easier to understand.
 
 ### Keep extension functions focused and contextual
 
@@ -75,13 +75,13 @@ In this bad example, the extension is:
 
  - Too generic (`List<Any>`)
  - Vaguely named (`filterValid()`)
- - Unclear in behavior — the reader has to inspect the implementation to understand what “valid” actually means.
+ - Unclear in behavior — the reader has to inspect the implementation to understand what "valid" actually means.
 
-Avoid vague, overly generic names like `filterValid()` or `toCleaned()`, especially if it’s not obvious what “valid” or “clean” means in that scope.
+Avoid vague, overly generic names like `filterValid()` or `toCleaned()`, especially if it's not obvious what "valid" or "clean" means in that scope.
 
 ### Avoid nullable types unless truly necessary
 
-Kotlin gives you powerful tools to model nullability explicitly — use them thoughtfully. If a value should always exist, don’t make it nullable "just in case."
+Kotlin gives you powerful tools to model nullability explicitly — use them thoughtfully. If a value should always exist, don't make it nullable "just in case."
 
 Instead of this:
 
@@ -97,3 +97,20 @@ lateinit var name: String
 Or better yet, design your class so that name can be injected or passed in directly and be non-null from the start.
 
 Make nullability meaningful—not a default.
+
+### Avoid `else` in exhaustive `when` statements
+
+When using `when` with enums, sealed classes, or sealed interfaces, avoid adding a catch-all `else` branch if you can enumerate all possible cases. Relying on `else` makes it much harder to find places in your code that need to be updated when new values are added to an enum, sealed class, or interface. Without `else`, the compiler will fail on unhandled cases, making your code safer and easier to maintain.
+
+For example:
+
+```kotlin
+when (state) {
+    is UiState.Loading -> showLoading()
+    is UiState.Error -> showError(state.reason)
+    is UiState.Success -> showData(state.data)
+    // No 'else' needed if all cases are covered
+}
+```
+
+If you add a new subclass to `UiState`, the compiler will alert you to update all relevant `when` statements. This helps prevent subtle bugs and ensures your code stays robust as your models evolve.
