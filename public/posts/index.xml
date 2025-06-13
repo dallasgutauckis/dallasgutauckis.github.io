@@ -1,0 +1,735 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Posts on Dallas Gutauckis</title>
+    <link>http://localhost:1313/posts/</link>
+    <description>Recent content in Posts on Dallas Gutauckis</description>
+    <generator>Hugo -- 0.147.8</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 13 Jun 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Thoughts on good Kotlin practices</title>
+      <link>http://localhost:1313/posts/2025-06-13-thoughts-on-good-kotlin-practices/</link>
+      <pubDate>Fri, 13 Jun 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2025-06-13-thoughts-on-good-kotlin-practices/</guid>
+      <description>&lt;p&gt;I recently joined a new company to continue my career in Android development and leadership. Part of that is seeing how people code, what the team has found valuable
+in the past for best practices, and sprinkling some of my own ideas in as time goes on.&lt;/p&gt;
+&lt;p&gt;I thought I&amp;rsquo;d share some of my thoughts here so that others can see these and consider them as well.&lt;/p&gt;
+&lt;h2 id=&#34;kotlin-best-practices&#34;&gt;Kotlin Best Practices&lt;/h2&gt;
+&lt;h3 id=&#34;only-use-destructuring-on-positional-classes&#34;&gt;Only use destructuring on positional classes&lt;/h3&gt;
+&lt;p&gt;Destructuring can be a really clean way to unpack data, but it should be reserved for data types where the order of fields makes intuitive sense—namely, positional classes
+like &lt;code&gt;Pair&lt;/code&gt;, &lt;code&gt;Triple&lt;/code&gt;, or when splitting a string, e.g.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>I recently joined a new company to continue my career in Android development and leadership. Part of that is seeing how people code, what the team has found valuable
+in the past for best practices, and sprinkling some of my own ideas in as time goes on.</p>
+<p>I thought I&rsquo;d share some of my thoughts here so that others can see these and consider them as well.</p>
+<h2 id="kotlin-best-practices">Kotlin Best Practices</h2>
+<h3 id="only-use-destructuring-on-positional-classes">Only use destructuring on positional classes</h3>
+<p>Destructuring can be a really clean way to unpack data, but it should be reserved for data types where the order of fields makes intuitive sense—namely, positional classes
+like <code>Pair</code>, <code>Triple</code>, or when splitting a string, e.g.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> input = <span style="color:#e6db74">&#34;userId=42&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> <span style="color:#960050;background-color:#1e0010">(</span>key, <span style="color:#66d9ef">value</span>) = input.split(<span style="color:#e6db74">&#34;=&#34;</span>)
+</span></span></code></pre></div><p>When you destructure something like <code>val (a, b, c) = someData</code>, it’s no longer obvious what <code>a</code>, <code>b</code>, or <code>c</code> actually represent without jumping back to the class definition.
+This hurts readability and can lead to subtle bugs if fields are ever reordered or misunderstood.</p>
+<p>Instead, prefer using named accessors (<code>someData.foo</code>) unless destructuring truly enhances clarity and is immediately obvious from context.</p>
+<h3 id="structure-state-in-a-way-that-models-the-data-available">Structure state in a way that models the data available</h3>
+<p>In modern Android architecture (especially with MVI), it&rsquo;s critical to design your UI state in a way that matches what the user can actually see or experience at a given moment. This usually means using a sealed class to represent the different &ldquo;modes&rdquo; of the screen:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">sealed</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UiState</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">object</span> <span style="color:#a6e22e">Loading</span> : UiState()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">data</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Error</span>(<span style="color:#66d9ef">val</span> reason: String) : UiState()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">data</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Success</span>(<span style="color:#66d9ef">val</span> data: MyData) : UiState()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This approach helps prevent invalid combinations of state (like showing both a spinner and an error) and makes it clear in the UI layer how to render each state. Each subclass should fully represent a single, valid UI configuration.</p>
+<h3 id="use-objectdata-object-not-class">Use <code>object</code>/<code>data object</code>, not <code>class</code>…</h3>
+<p>You’ll often see people reach for <code>class</code> when they really mean <code>object</code>, especially for singleton values. There’s a <a href="https://medium.com/android-news/memory-efficiency-with-sealed-object-d7941ce8a66c">widely shared article</a> that argues for using <code>object</code> on the basis of memory efficiency — but that’s largely a red herring.</p>
+<p>In practice, the memory savings are negligible. The real value in using <code>object</code> or <code>data object</code> (as of Kotlin 1.9) is <strong>clarity of intent</strong>: if something doesn’t carry instance-specific data and doesn’t need to be instantiated multiple times, it <em>shouldn’t</em> be a class.</p>
+<p>This makes your code easier to reason about. Using <code>object</code> reduces boilerplate and makes exhaustive <code>when</code> statements cleaner and more reliable, since there&rsquo;s no ambiguity around instantiation or equality.</p>
+<p>It’s not about saving memory — it’s about making your code harder to misuse and easier to understand.</p>
+<h3 id="keep-extension-functions-focused-and-contextual">Keep extension functions focused and contextual</h3>
+<p>Extension functions are great for adding functionality to existing types, but they can become a dumping ground if not scoped appropriately.
+Prefer keeping them close to where they&rsquo;re used (e.g. in the same file or module) and naming them in a way that reflects their context.</p>
+<p>Good:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">List</span>&lt;Event&gt;.upcomingOnly(): List&lt;Event&gt; = filter { <span style="color:#66d9ef">it</span>.date &gt; now }
+</span></span></code></pre></div><p>Bad:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">fun</span> <span style="color:#a6e22e">List</span>&lt;Any&gt;.filterValid(): List&lt;Any&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Who knows what &#34;valid&#34; means here?
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> filterNotNull()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>In this bad example, the extension is:</p>
+<ul>
+<li>Too generic (<code>List&lt;Any&gt;</code>)</li>
+<li>Vaguely named (<code>filterValid()</code>)</li>
+<li>Unclear in behavior — the reader has to inspect the implementation to understand what “valid” actually means.</li>
+</ul>
+<p>Avoid vague, overly generic names like <code>filterValid()</code> or <code>toCleaned()</code>, especially if it’s not obvious what “valid” or “clean” means in that scope.</p>
+<h3 id="avoid-nullable-types-unless-truly-necessary">Avoid nullable types unless truly necessary</h3>
+<p>Kotlin gives you powerful tools to model nullability explicitly — use them thoughtfully. If a value should always exist, don’t make it nullable &ldquo;just in case.&rdquo;</p>
+<p>Instead of this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> name: String? = <span style="color:#66d9ef">null</span>
+</span></span></code></pre></div><p>&hellip;consider this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-kotlin" data-lang="kotlin"><span style="display:flex;"><span><span style="color:#66d9ef">lateinit</span> <span style="color:#66d9ef">var</span> name: String
+</span></span></code></pre></div><p>Or better yet, design your class so that name can be injected or passed in directly and be non-null from the start.</p>
+<p>Make nullability meaningful—not a default.</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Testing APIs with Android: An Example</title>
+      <link>http://localhost:1313/posts/2015-04-23-testing-apis-with-android-an-example/</link>
+      <pubDate>Thu, 23 Apr 2015 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2015-04-23-testing-apis-with-android-an-example/</guid>
+      <description>&lt;p&gt;It&amp;rsquo;s not easy to jump into automated testing. It&amp;rsquo;s certainly not easy to jump into automated testing on Android.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>It&rsquo;s not easy to jump into automated testing. It&rsquo;s certainly not easy to jump into automated testing on Android.</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Generate JUnit assertions from your JSON</title>
+      <link>http://localhost:1313/posts/2015-02-27-generate-junit-assertions-from-your-json/</link>
+      <pubDate>Fri, 27 Feb 2015 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2015-02-27-generate-junit-assertions-from-your-json/</guid>
+      <description>&lt;p&gt;Got some JSON you want to build into a model and test?&lt;/p&gt;
+&lt;p&gt;It can be pretty tedious writing all of that code. Instead, why not generate the assert* code automatically? I&amp;rsquo;ve been writing code manually for a while now and finally decided to build something to write that boilerplate code for me.&lt;/p&gt;
+&lt;p&gt;I&amp;rsquo;ve put up a &lt;a href=&#34;http://json-java-test-writer.herokuapp.com&#34;&gt;live version&lt;/a&gt; for anyone to use, as well as &lt;a href=&#34;http://github.com/dallasgutauckis/java-json-test-writer&#34;&gt;open-sourced it on GitHub&lt;/a&gt;. Let me know what you think!&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>Got some JSON you want to build into a model and test?</p>
+<p>It can be pretty tedious writing all of that code. Instead, why not generate the assert* code automatically? I&rsquo;ve been writing code manually for a while now and finally decided to build something to write that boilerplate code for me.</p>
+<p>I&rsquo;ve put up a <a href="http://json-java-test-writer.herokuapp.com">live version</a> for anyone to use, as well as <a href="http://github.com/dallasgutauckis/java-json-test-writer">open-sourced it on GitHub</a>. Let me know what you think!</p>
+<p>Here&rsquo;s some JSON to test with:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>     <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">2</span>,
+</span></span><span style="display:flex;"><span>     <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;An ice sculpture&#34;</span>,
+</span></span><span style="display:flex;"><span>     <span style="color:#f92672">&#34;price&#34;</span>: <span style="color:#ae81ff">12.50</span>,
+</span></span><span style="display:flex;"><span>     <span style="color:#f92672">&#34;tags&#34;</span>: [<span style="color:#e6db74">&#34;cold&#34;</span>, <span style="color:#e6db74">&#34;ice&#34;</span>],
+</span></span><span style="display:flex;"><span>     <span style="color:#f92672">&#34;dimensions&#34;</span>: {
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">&#34;length&#34;</span>: <span style="color:#ae81ff">7.0</span>,
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">&#34;width&#34;</span>: <span style="color:#ae81ff">12.0</span>,
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">&#34;height&#34;</span>: <span style="color:#ae81ff">9.5</span>
+</span></span><span style="display:flex;"><span>     },
+</span></span><span style="display:flex;"><span>     <span style="color:#f92672">&#34;warehouse_location&#34;</span>: {
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">&#34;latitude&#34;</span>: <span style="color:#ae81ff">-78.75</span>,
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">&#34;longitude&#34;</span>: <span style="color:#ae81ff">20.4</span>
+</span></span><span style="display:flex;"><span>     }
+</span></span><span style="display:flex;"><span> }
+</span></span></code></pre></div>]]></content:encoded>
+    </item>
+    <item>
+      <title>Android Animations: Bring Your Application to Life</title>
+      <link>http://localhost:1313/posts/2015-02-02-android-animations-bring-your-application-to-life/</link>
+      <pubDate>Mon, 02 Feb 2015 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2015-02-02-android-animations-bring-your-application-to-life/</guid>
+      <description>&lt;p&gt;My Animation talk from Droidcon New York City 2014&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://speakerdeck.com/dallasgutauckis/android-animations&#34;&gt;Slides on SpeakerDeck&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.dropbox.com/s/qhim23pfk3smsse/Android%20Animations.zip?dl=0&#34;&gt;Original keynote with animations&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/dallasgutauckis/AnimationStation&#34;&gt;Sample app for camera distance tip&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Video:&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;</description>
+      <content:encoded><![CDATA[<p>My Animation talk from Droidcon New York City 2014</p>
+<ul>
+<li><a href="https://speakerdeck.com/dallasgutauckis/android-animations">Slides on SpeakerDeck</a></li>
+<li><a href="https://www.dropbox.com/s/qhim23pfk3smsse/Android%20Animations.zip?dl=0">Original keynote with animations</a></li>
+<li><a href="https://github.com/dallasgutauckis/AnimationStation">Sample app for camera distance tip</a></li>
+</ul>
+<p>Video:</p>
+<!-- raw HTML omitted -->
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Wi-Fi issues on Moto X 2nd Gen</title>
+      <link>http://localhost:1313/posts/2014-09-26-wi-fi-issues-on-moto-x-2nd-gen/</link>
+      <pubDate>Fri, 26 Sep 2014 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2014-09-26-wi-fi-issues-on-moto-x-2nd-gen/</guid>
+      <description>&lt;p&gt;I received my 2nd Gen Moto X today. During setup, I attempted to connect to our company&amp;rsquo;s Wi-Fi network to no avail. I was able to connect to another public Wi-Fi in the area but for some reason not to our typical Cisco WAP setup at work. All of the other devices we have at work are able to connect to the network, so I&amp;rsquo;m not sure what is going on.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>I received my 2nd Gen Moto X today. During setup, I attempted to connect to our company&rsquo;s Wi-Fi network to no avail. I was able to connect to another public Wi-Fi in the area but for some reason not to our typical Cisco WAP setup at work. All of the other devices we have at work are able to connect to the network, so I&rsquo;m not sure what is going on.</p>
+<p>I&rsquo;ve contacted Motorola customer support, supplied a logcat output of the Wi-Fi-related messages during the connection attempt, but they were not immediately able to resolve the issue. Instead, they&rsquo;ve gathered my information and will be reaching out to me after escalating the issue internally.</p>
+<p>I&rsquo;ll follow up more here as this issue and hopefully resolution progresses.</p>
+<p><strong>UPDATE 1 [2014-09-26T14:30:00EST]</strong>: Motorola has called me back and are currently connecting me to their &ldquo;level 2 support&rdquo;. I&rsquo;m on hold now waiting for them to chime in. Will update more as this progresses.</p>
+<p><strong>UPDATE 2 [2014-09-26T14:40:00EST]</strong>: Motorola got back on the phone with me and explained that their level 2 support is currently swamped and that they have my information and will call me in the next 24 hours.</p>
+<p><em>In the meantime, I&rsquo;ll just blow through my carrier data allocation as I install all of my apps again (because I had to reset my phone to see if that&rsquo;d solve the problem).</em></p>
+<p><strong>UPDATE 3 [2014-09-27T14:07:00EST]</strong>: Someone by the name of &lsquo;Matt&rsquo; followed up on this blog in the comments to ask me to bring the conversation to email. So, I did. The conversation so far is as follows:</p>
+<p><strong>Me to them</strong></p>
+<blockquote>
+<p>From: Dallas Gutauckis &lt;[redacted]&gt;<br>
+Date: Fri, Sep 26, 2014 at 11:37 PM<br>
+Subject: Re: <a href="http://dallasgutauckis.com/2014/09/26/wi-fi-issues-on-moto-x-2nd-gen/#comments">http://dallasgutauckis.com/2014/09/26/wi-fi-issues-on-moto-x-2nd-gen/#comments</a><br>
+To: <a href="mailto:supportforums@motorola.com">supportforums@motorola.com</a></p>
+<p>Hi,</p>
+<p>Someone naming himself Matt commented on my blog post about the Wi-Fi issue some users are having with their 2nd Gen Moto X asking me to reach out. I already have an ongoing support issue ([redacted]) where I also already shared logcat output — not much but all I could give.</p>
+<p>Let me know if there is something else I can provide to get this matter resolved expediently.</p>
+<p>Best,<br>
+Dallas</p></blockquote>
+<p><strong>Them to me</strong></p>
+<blockquote>
+<p>From: Motorola Support Forums &lt;[redacted]&gt;<br>
+Date: Sat, Sep 27, 2014 at 10:00 AM<br>
+Subject: Re: <a href="http://dallasgutauckis.com/2014/09/26/wi-fi-issues-on-moto-x-2nd-gen/#comments">http://dallasgutauckis.com/2014/09/26/wi-fi-issues-on-moto-x-2nd-gen/#comments</a><br>
+To: Dallas Gutauckis &lt;[redacted]&gt;</p>
+<p>Hi Dallas.</p>
+<p>Have you updated your router software? The Wifi team says old software versions of Cisco APs have problem with PMF supported devices. Cisco fixed this issue in later software versions.</p>
+<p>Let me know if that helps. Thanks.</p>
+<ul>
+<li>Matt</li>
+</ul>
+<p>Matt and Mark<br>
+Social Media - Customer Care<br>
+Motorola Mobility<br>
+Visit us at <a href="https://forums.motorola.com">https://forums.motorola.com</a></p></blockquote>
+<p><strong>Me to them</strong></p>
+<blockquote>
+<p>From: Dallas Gutauckis &lt;[redacted]&gt;<br>
+Date: Sat, Sep 27, 2014 at 2:06 PM<br>
+Subject: Re: <a href="http://dallasgutauckis.com/2014/09/26/wi-fi-issues-on-moto-x-2nd-gen/#comments">http://dallasgutauckis.com/2014/09/26/wi-fi-issues-on-moto-x-2nd-gen/#comments</a><br>
+To: Motorola Support Forums &lt;[redacted]&gt;</p>
+<p>Matt,</p>
+<p>I&rsquo;m unaware of whether the AP is up to date, and unfortunately, I&rsquo;m not going to be able to simply try to update the routers because we don&rsquo;t employ any full-time IT staff capable of managing the routers — this would instead require we pay a contractor to come in and ensure they&rsquo;re up-to-date, something I&rsquo;m not willing to do if we can&rsquo;t be sure it&rsquo;s the problem.</p>
+<p>I know of other people having the issue — they might be able to check such a thing on their network. See <a href="https://twitter.com/cavega_/status/515566709927706624">https://twitter.com/cavega_/status/515566709927706624</a></p></blockquote>
+<p>What I still don&rsquo;t understand is why this is a 2nd-Gen-specific issue and not 1st-Gen. I realize they&rsquo;re different devices, and potentially different networking hardware, but I would assume if it can work on one, it can work on the other.</p>
+<p>Not yet sure where this is going to get us…</p>
+<p><strong>UPDATE 4 [~2014-09-27T9:00:00EST]</strong>: Got a call that went to voicemail (because I was still asleep). The caller said they were just checking in on me to see if my issue was fixed or not. If it wasn&rsquo;t, they gave me the number to contact their level 1 support (seems I&rsquo;ve been downgraded). Obviously, nothing has changed, so nothing is resolved. <em>Note that this call came in before the email response from Matt.</em></p>
+<p><strong>UPDATE 5 [2014-10-07T19:30:00EST]</strong>: Our IT contractor happened to need to come in to set up network redundancy for our internet connection, at which time we also asked him to update the Cisco controller. The update seems to have fixed the PMF as suggested by Motorola support. Quick! Call your IT gang out to update your controllers. Best of luck to all. Still a ridiculously shitty experience to have for a new device [where they know it&rsquo;s going to be broken for users].</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Android Animation &amp;mdash; Bringing Your Applications to Life @ Droidcon NYC 2014</title>
+      <link>http://localhost:1313/posts/2014-09-25-android-animation-bringing-your-applications-to-life-droidcon-nyc-2014/</link>
+      <pubDate>Thu, 25 Sep 2014 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2014-09-25-android-animation-bringing-your-applications-to-life-droidcon-nyc-2014/</guid>
+      <description>&lt;p&gt;Last weekend, I gave a talk on animation on Android at the innaugural Droidcon NYC (2014). The talk was well-received and I got some tough questions. Nonetheless, I&amp;rsquo;m happy I did it and I&amp;rsquo;m posting the presentation for your viewing pleasure. I highly recommend checking out the actual Keynote file (linked to from the Speakerdeck site) if you can as it includes the videos/animations as opposed to just static images.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>Last weekend, I gave a talk on animation on Android at the innaugural Droidcon NYC (2014). The talk was well-received and I got some tough questions. Nonetheless, I&rsquo;m happy I did it and I&rsquo;m posting the presentation for your viewing pleasure. I highly recommend checking out the actual Keynote file (linked to from the Speakerdeck site) if you can as it includes the videos/animations as opposed to just static images.</p>
+<p><a href="https://speakerdeck.com/dallasgutauckis/android-animations">speakerdeck</a></p>
+<p>You can check out all of my presentations (regardless of how old they are) at <a href="/about/presentations/">/about/presentations/</a></p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Android Authority: Best resources for Android development</title>
+      <link>http://localhost:1313/posts/2014-05-11-android-authority-best-resources-for-android-development/</link>
+      <pubDate>Sun, 11 May 2014 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2014-05-11-android-authority-best-resources-for-android-development/</guid>
+      <description>&lt;blockquote&gt;
+&lt;p&gt;Whether you’re a seasoned professional or just beginning with Android development, this list of resources (including tools, libraries, and blogs) is useful for any developer or team on just about any project, big or small.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;Read more: &lt;a href=&#34;http://www.androidauthority.com/best-resources-android-development-372414/&#34; title=&#34;Best resources for Android development&#34;&gt;Best resources for Android development&lt;/a&gt;&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<blockquote>
+<p>Whether you’re a seasoned professional or just beginning with Android development, this list of resources (including tools, libraries, and blogs) is useful for any developer or team on just about any project, big or small.</p></blockquote>
+<p>Read more: <a href="http://www.androidauthority.com/best-resources-android-development-372414/" title="Best resources for Android development">Best resources for Android development</a></p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Listing connected Android devices with OS version and model</title>
+      <link>http://localhost:1313/posts/2014-04-09-listing-connected-android-devices-with-os-version-and-model/</link>
+      <pubDate>Wed, 09 Apr 2014 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2014-04-09-listing-connected-android-devices-with-os-version-and-model/</guid>
+      <description>&lt;p&gt;I was wandering down the path of trying to associate the myriad of devices connected to my machine for debugging. I wanted to know very easily what the devices&amp;rsquo; model and OS version were without having to manual check by disconnecting and reconnecting devices and using the process of elimination.&lt;/p&gt;
+&lt;p&gt;One way to see this information is using a special flag with adb:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;adb devices -l
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This yields something like&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;List of devices attached
+
+HT16JHX24920 device usb:14130000  
+
+015d2a506750081b device usb:14120000 product:nakasi model:Nexus_7 device:grouper  
+
+4d005e148cc950eb device usb:14112000 product:ja3gub model:GT_I9500 device:ja3g  
+
+0A3BC06A11010002 device usb:14140000  
+
+e08b84fd device usb:14113000  
+
+HT346W912280 device usb:14114000  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Which as you can probably tell doesn&amp;rsquo;t give us all of the information we want, nor does it seem to work on every device.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>I was wandering down the path of trying to associate the myriad of devices connected to my machine for debugging. I wanted to know very easily what the devices&rsquo; model and OS version were without having to manual check by disconnecting and reconnecting devices and using the process of elimination.</p>
+<p>One way to see this information is using a special flag with adb:</p>
+<pre tabindex="0"><code>adb devices -l
+</code></pre><p>This yields something like</p>
+<pre><code>List of devices attached
+
+HT16JHX24920 device usb:14130000  
+
+015d2a506750081b device usb:14120000 product:nakasi model:Nexus_7 device:grouper  
+
+4d005e148cc950eb device usb:14112000 product:ja3gub model:GT_I9500 device:ja3g  
+
+0A3BC06A11010002 device usb:14140000  
+
+e08b84fd device usb:14113000  
+
+HT346W912280 device usb:14114000  
+</code></pre>
+<p>Which as you can probably tell doesn&rsquo;t give us all of the information we want, nor does it seem to work on every device.</p>
+<p>So instead, I wrote a script for printing out what I needed. The bash script reads properties from the device via <code>adb shell</code>.</p>
+<p>The output for that looks like:</p>
+<pre><code>    HT16JHX24920 [ 4.0.3]: PG86100  
+
+015d2a506750081b [ 4.4.2]: Nexus 7  
+
+4d005e148cc950eb [   4.3]: GT-I9500  
+
+0A3BC06A11010002 [ 4.1.2]: DROID RAZR  
+
+        e08b84fd [ 4.1.1]: SAMSUNG-SGH-I747  
+
+    HT346W912280 [ 4.1.2]: HTC One  
+</code></pre>
+<p><a href="https://gist.github.com/dallasgutauckis/10306968">View, download, or fork the script</a></p>
+<p>In case you were curious, the corresponding properties are:</p>
+<pre><code>$ adb shell getprop ro.product.model  
+
+PG86100  
+</code></pre>
+<p>and</p>
+<pre><code>$ adb -s HT16JHX24920 shell getprop ro.build.version.release
+
+4.0.3
+</code></pre>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Making Borders for Views Using layer-list</title>
+      <link>http://localhost:1313/posts/2014-03-20-making-borders-for-views-using-layer-list/</link>
+      <pubDate>Thu, 20 Mar 2014 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2014-03-20-making-borders-for-views-using-layer-list/</guid>
+      <description>&lt;p&gt;Android is full of many ways to do things differently. One of those things happens to be making a border for a View.&lt;/p&gt;
+&lt;p&gt;The common approach I&amp;rsquo;ve seen is for developers to have two Views. One View is the View with a background (be it solid, bitmap, or otherwise). The other View acts as a border, typically either 1px or 1dp in width or height, the other side matching the height or width of the other View. Although this is certainly an easy approach, at adds more to your layout than is likely necessary.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>Android is full of many ways to do things differently. One of those things happens to be making a border for a View.</p>
+<p>The common approach I&rsquo;ve seen is for developers to have two Views. One View is the View with a background (be it solid, bitmap, or otherwise). The other View acts as a border, typically either 1px or 1dp in width or height, the other side matching the height or width of the other View. Although this is certainly an easy approach, at adds more to your layout than is likely necessary.</p>
+<p>Example with Views:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;View</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">android:layout_width=</span><span style="color:#e6db74">&#34;match_parent&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">android:layout_height=</span><span style="color:#e6db74">&#34;1px&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">android:background=</span><span style="color:#e6db74">&#34;#ccc&#34;</span> <span style="color:#f92672">/&gt;&lt;/p&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;TextView</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">android:layout_width=</span><span style="color:#e6db74">&#34;match_parent&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">android:layout_height=</span><span style="color:#e6db74">&#34;wrap_content&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">android:background=</span><span style="color:#e6db74">&#34;#eee&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">android:text=</span><span style="color:#e6db74">&#34;Hello, World&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span></code></pre></div><p>Assuming those Views are encapsulated in a LinearLayout with vertical orientation, you&rsquo;ll end up with a TextView with background of <code>#eee</code> and top border of <code>#ccc</code>.</p>
+<p>Now, let me introduce you to <a href="http://developer.android.com/guide/topics/resources/drawable-resource.html#LayerList">layer-list</a>…</p>
+<p>layer-list allows you to do many things regarding multiple drawables. One of the more common implementations is adding a border to something.</p>
+<p>I&rsquo;ll explain by example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#75715e">&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;layer-list</span> <span style="color:#a6e22e">xmlns:android=</span><span style="color:#e6db74">&#34;http://schemas.android.com/apk/res/android&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;item&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;shape&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;solid</span> <span style="color:#a6e22e">android:color=</span><span style="color:#e6db74">&#34;#ccc&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;/shape&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/item&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;item</span> <span style="color:#a6e22e">android:top=</span><span style="color:#e6db74">&#34;1px&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;shape&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;solid</span> <span style="color:#a6e22e">android:color=</span><span style="color:#e6db74">&#34;#eee&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;/shape&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/item&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/layer-list&gt;</span>
+</span></span></code></pre></div><p>What this example shows is the layer-list way of going about the previous example. This will produce a drawable that has a 1px solid top border colored <code>#ccc</code> and a background of <code>#eee</code>. The confusing part to this for most people tends to be where the 1px is designated. layer-list draws top-down in the XML. This means that #ccc is drawn in the full background first, and then #eee is drawn over top of that, with a 1px top offset.</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>A Better Parcelabler...</title>
+      <link>http://localhost:1313/posts/2014-02-10-a-better-parcelabler/</link>
+      <pubDate>Mon, 10 Feb 2014 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2014-02-10-a-better-parcelabler/</guid>
+      <description>&lt;p&gt;A little bit ago (okay, a long time ago) I wrote &lt;a href=&#34;http://dallasgutauckis.com/2012/01/20/parcelabler-for-implementing-androids-parcelable-interface/&#34; title=&#34;parcelabler: for implementing Android’s Parcelable interface&#34;&gt;a blog post about a tool I wrote for creating Parcelable implementations for Android&lt;/a&gt;. At time of writing, I knew it wasn&amp;rsquo;t a great solution, but that at least it worked&amp;hellip; Since then, I constantly put off writing what I thought would be a better solution: an IDE plugin.&lt;/p&gt;
+&lt;p&gt;So last week, I embarked upon the journey of making a plugin for Android Studio. I immediately saw that &lt;a href=&#34;https://github.com/mcharmas/android-parcelable-intellij-plugin&#34;&gt;something existed&lt;/a&gt;, but it was a bit older, and not quite as feature-packed as I had hoped. So, I took it upon myself to &lt;a href=&#34;https://github.com/mcharmas/android-parcelable-intellij-plugin/pull/7&#34;&gt;make some enhancements and submit a pull request&lt;/a&gt;.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>A little bit ago (okay, a long time ago) I wrote <a href="http://dallasgutauckis.com/2012/01/20/parcelabler-for-implementing-androids-parcelable-interface/" title="parcelabler: for implementing Android’s Parcelable interface">a blog post about a tool I wrote for creating Parcelable implementations for Android</a>. At time of writing, I knew it wasn&rsquo;t a great solution, but that at least it worked&hellip; Since then, I constantly put off writing what I thought would be a better solution: an IDE plugin.</p>
+<p>So last week, I embarked upon the journey of making a plugin for Android Studio. I immediately saw that <a href="https://github.com/mcharmas/android-parcelable-intellij-plugin">something existed</a>, but it was a bit older, and not quite as feature-packed as I had hoped. So, I took it upon myself to <a href="https://github.com/mcharmas/android-parcelable-intellij-plugin/pull/7">make some enhancements and submit a pull request</a>.</p>
+<p>I&rsquo;ll be continuing development under <a href="https://github.com/dallasgutauckis/android-parcelable-intellij-plugin">my fork</a>, where you&rsquo;ll always be able to grab the latest as I work on enhancements. Please feel free to fork and submit pull requests as well.</p>
+<p><a href="https://github.com/dallasgutauckis/android-parcelable-intellij-plugin">Check out the plugin&hellip;</a></p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Moving to New Opportunities, New Things, New York...</title>
+      <link>http://localhost:1313/posts/2014-02-04-one-new-place-to-another/</link>
+      <pubDate>Tue, 04 Feb 2014 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2014-02-04-one-new-place-to-another/</guid>
+      <description>&lt;p&gt;Over six-and-a-half years ago, I joined a small startup, MeetMe (then myYearbook), of around 20 or 30 employees in the small, artsy town of New Hope, PA. Over the years, MeetMe provided me with many opportunities to grow and learn, allowing me to transition from a full stack web engineer to an Android engineer. I truly am grateful not only for the opportunities that I&amp;rsquo;ve been given, but also for the team that I&amp;rsquo;ve gotten to work with.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>Over six-and-a-half years ago, I joined a small startup, MeetMe (then myYearbook), of around 20 or 30 employees in the small, artsy town of New Hope, PA. Over the years, MeetMe provided me with many opportunities to grow and learn, allowing me to transition from a full stack web engineer to an Android engineer. I truly am grateful not only for the opportunities that I&rsquo;ve been given, but also for the team that I&rsquo;ve gotten to work with.</p>
+<p>But then, there is change. I&rsquo;ve decided to make a transition and move on to new opportunities. I can&rsquo;t express how excited I am to transition to my new role as the lead Android engineer for SeatGeek, a search engine of sorts for finding great tickets to events &ndash; be it sports, theater, music, or otherwise.</p>
+<p>I&rsquo;m excited for all of the new challenges I&rsquo;ll face working with the <a href="http://seatgeek.com">SeatGeek</a> team, and I wish all of the best to the MeetMe team as they continue to help the world meet new and interesting people.</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Android Animation: Bringing Your Application to Life</title>
+      <link>http://localhost:1313/posts/2013-12-31-android-animation-bringing-your-application-to-life/</link>
+      <pubDate>Tue, 31 Dec 2013 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2013-12-31-android-animation-bringing-your-application-to-life/</guid>
+      <description>&lt;p&gt;At MeetMe, we have a yearly internal conference wherein we invite folks internal and external to speak to the team (en masse &amp;amp; in breakouts) about emerging technology, trends, core company bits, etc. My core focus this year has been about spicing up our Android applications through exceptional UI/UX specifically using the grace and beauty of animations. As they say, sharing is caring, and I want everyone else to have access&amp;hellip; so please, take a look through my presentation. If you have feedback, questions, hate mail, or anything else &amp;ndash; please comment below.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>At MeetMe, we have a yearly internal conference wherein we invite folks internal and external to speak to the team (en masse &amp; in breakouts) about emerging technology, trends, core company bits, etc. My core focus this year has been about spicing up our Android applications through exceptional UI/UX specifically using the grace and beauty of animations. As they say, sharing is caring, and I want everyone else to have access&hellip; so please, take a look through my presentation. If you have feedback, questions, hate mail, or anything else &ndash; please comment below.</p>
+<p><a href="https://speakerdeck.com/dallasgutauckis/android-animation"><img alt="Screen Shot 2013-12-31 at 17.15.49" loading="lazy" src="http://res.cloudinary.com/drnxhecup/image/upload/c_crop,h_528,w_528,x_88,y_0/h_150,w_150/v1395532660/Screen-Shot-2013-12-31-at-17_15_49_rapucj.png"></a></p>
+<p><a href="https://speakerdeck.com/dallasgutauckis/android-animation">https://speakerdeck.com/dallasgutauckis/android-animation</a></p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Android: putting a ViewPager inside a ListView</title>
+      <link>http://localhost:1313/posts/2013-04-30-android-putting-a-viewpager-inside-a-listview/</link>
+      <pubDate>Tue, 30 Apr 2013 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2013-04-30-android-putting-a-viewpager-inside-a-listview/</guid>
+      <description>&lt;p&gt;So, I&amp;rsquo;ve been Googling for a while to find a clean, reasonable approach for putting a &lt;code&gt;ViewPager&lt;/code&gt; inside of a &lt;code&gt;ListView&lt;/code&gt; (or any vertically scrolling element). The problem with putting a &lt;code&gt;ViewPager&lt;/code&gt; inside a &lt;code&gt;ListView&lt;/code&gt; is that it takes only a small amount of vertical (Y) delta before the &lt;code&gt;ListView&lt;/code&gt; begins to consume touch events instead of delegating to the child in order to enable the scrolling of the &lt;code&gt;ListView&lt;/code&gt;. That&amp;rsquo;s fine, but the problem often occurs after the &lt;code&gt;ViewPager&lt;/code&gt; has already started processing a page change (when dragging horizontally), producing a poor user experience resulting in the improper pagination and scrolling of the two views.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>So, I&rsquo;ve been Googling for a while to find a clean, reasonable approach for putting a <code>ViewPager</code> inside of a <code>ListView</code> (or any vertically scrolling element). The problem with putting a <code>ViewPager</code> inside a <code>ListView</code> is that it takes only a small amount of vertical (Y) delta before the <code>ListView</code> begins to consume touch events instead of delegating to the child in order to enable the scrolling of the <code>ListView</code>. That&rsquo;s fine, but the problem often occurs after the <code>ViewPager</code> has already started processing a page change (when dragging horizontally), producing a poor user experience resulting in the improper pagination and scrolling of the two views.</p>
+<p>There are a few ways to try to handle this.</p>
+<ol>
+<li><a href="http://stackoverflow.com/questions/8674529/viewpager-inside-listview">You could not do it at all (thanks Dianne and Mark)</a></li>
+<li>You can set a touch listener on the <code>ListView</code> and try to delegate the touches based on which view you think needs to get the touches and what actions need to occur based on those touches.</li>
+<li>You can also combine a touch listener with GestureDetector to try to make the implementation a little less cumbersome. The problem is that in some ListViews, our layouts are a little more complex than single item rows of text. If the item layout has for instance a Button, we&rsquo;d then need to properly delegate the touch event down to the Button. This obviously has huge ramifications for implementation and testing.</li>
+</ol>
+<p>In order to avoid the aforementioned shenanigans, I added an <a href="http://developer.android.com/reference/android/support/v4/view/ViewPager.OnPageChangeListener.html"><code>OnPageChangeListener</code></a> to the <code>ViewPager</code> and based on the state of the pager, forced a touch delegate from the <code>Activity</code>.</p>
+<p>Contrived example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyActivity</span> <span style="color:#66d9ef">extends</span> Activity {  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> ViewPager mViewPager;  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> View mTouchTarget;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onCreate</span>(Bundle icicle) {  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">super</span>.<span style="color:#a6e22e">onCreate</span>(icicle);  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        setContentView(R.<span style="color:#a6e22e">layout</span>.<span style="color:#a6e22e">example</span>);
+</span></span><span style="display:flex;"><span>        mViewPager <span style="color:#f92672">=</span> (ViewPager) findViewById(R.<span style="color:#a6e22e">id</span>.<span style="color:#a6e22e">view_pager</span>);
+</span></span><span style="display:flex;"><span>        mViewPager.<span style="color:#a6e22e">setOnPageChangeListener</span>(<span style="color:#66d9ef">new</span> OnPageChangeListener() {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> mPreviousState <span style="color:#f92672">=</span> ViewPager.<span style="color:#a6e22e">SCROLL_STATE_IDLE</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onPageSelected</span>(<span style="color:#66d9ef">int</span> position) {  
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// NO-OP</span>
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">@Override</span>  
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onPageScrolled</span>(<span style="color:#66d9ef">int</span> position, <span style="color:#66d9ef">float</span> positionOffset, <span style="color:#66d9ef">int</span> positionOffsetPixels) {  
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// NO-OP</span>
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">onPageScrollStateChanged</span>(<span style="color:#66d9ef">int</span> state) {
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// All of this is to inhibit any scrollable container from consuming our touch events as the user is changing pages</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> (mPreviousState <span style="color:#f92672">==</span> ViewPager.<span style="color:#a6e22e">SCROLL_STATE_IDLE</span>) {
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> (state <span style="color:#f92672">==</span> ViewPager.<span style="color:#a6e22e">SCROLL_STATE_DRAGGING</span>) {
+</span></span><span style="display:flex;"><span>                        mTouchTarget <span style="color:#f92672">=</span> mViewPager;
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> (state <span style="color:#f92672">==</span> ViewPager.<span style="color:#a6e22e">SCROLL_STATE_IDLE</span> <span style="color:#f92672">||</span> state <span style="color:#f92672">==</span> ViewPager.<span style="color:#a6e22e">SCROLL_STATE_SETTLING</span>) {
+</span></span><span style="display:flex;"><span>                        mTouchTarget <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                mPreviousState <span style="color:#f92672">=</span> state;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">dispatchTouchEvent</span>(MotionEvent ev) {  
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (mTouchTarget <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {  
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">boolean</span> wasProcessed <span style="color:#f92672">=</span> mTouchTarget.<span style="color:#a6e22e">onTouchEvent</span>(ev);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>wasProcessed) {  
+</span></span><span style="display:flex;"><span>                mTouchTarget <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;  
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> wasProcessed;  
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">super</span>.<span style="color:#a6e22e">dispatchTouchEvent</span>(ev);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Now, we have a ViewPager that retains control of touch events once the page starts changing and releases it when paging is idle or settling.</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Renaming files by pattern</title>
+      <link>http://localhost:1313/posts/2013-04-29-renaming-files-by-pattern/</link>
+      <pubDate>Mon, 29 Apr 2013 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2013-04-29-renaming-files-by-pattern/</guid>
+      <description>&lt;p&gt;Occasionally (and especially when receiving assets) I have the need to rename multiple files at once &amp;ndash; often by some sort of pattern. For instance, I may need to rename all files with the string &lt;code&gt;&amp;quot;_msg&amp;quot;&lt;/code&gt; in it where the file ends with &lt;code&gt;&amp;quot;.png&amp;quot;&lt;/code&gt;. Previously, I might have manually found and renamed all of them or written some hack of a bash &amp;ldquo;for loop&amp;rdquo; to iterate over a &lt;code&gt;find&lt;/code&gt; result. Neither options are quick or easy.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>Occasionally (and especially when receiving assets) I have the need to rename multiple files at once &ndash; often by some sort of pattern. For instance, I may need to rename all files with the string <code>&quot;_msg&quot;</code> in it where the file ends with <code>&quot;.png&quot;</code>. Previously, I might have manually found and renamed all of them or written some hack of a bash &ldquo;for loop&rdquo; to iterate over a <code>find</code> result. Neither options are quick or easy.</p>
+<p>Recently, I found a great and simple util called <code>rename</code> to quickly and easily rename files with simple search-and-replace functionality.</p>
+<p>In this example, I&rsquo;m renaming any <em>.png file under a drawable</em> folder, replacing <code>_msg</code> with <code>_message</code>.</p>
+<!-- raw HTML omitted -->
+<p>The <code>rename</code> util (not the same as <code>mv</code>) comes standard with most linux installations, but I&rsquo;m on Mac OS X and that means I have to get it separately. In order to easily get rename, I use <a href="http://brew.sh/" title="homebrew">homebrew</a>.</p>
+<ol start="0">
+<li>Install <a href="http://brew.sh/" title="homebrew">homebrew</a>.
+<code>ruby -e &quot;$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)&quot;</code></li>
+<li>Install rename
+<code>brew install rename</code></li>
+<li>Done.</li>
+</ol>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>How MeetMe Went International on Android</title>
+      <link>http://localhost:1313/posts/2012-10-01-how-meetme-went-international-on-android/</link>
+      <pubDate>Mon, 01 Oct 2012 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2012-10-01-how-meetme-went-international-on-android/</guid>
+      <description>&lt;p&gt;Check out my post on &lt;a href=&#34;http://engineering.meetme.com/2012/09/meetme-goes-international-on-android/&#34;&gt;how MeetMe went international on Android&lt;/a&gt; over on our Engineering Blog.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>Check out my post on <a href="http://engineering.meetme.com/2012/09/meetme-goes-international-on-android/">how MeetMe went international on Android</a> over on our Engineering Blog.</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Joining Android Alliance Philadelphia</title>
+      <link>http://localhost:1313/posts/2012-06-06-joining-android-alliance-philadelphia/</link>
+      <pubDate>Wed, 06 Jun 2012 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2012-06-06-joining-android-alliance-philadelphia/</guid>
+      <description>&lt;p&gt;I was recently asked by &lt;a href=&#34;http://coreylatislaw.com&#34;&gt;Corey Latislaw&lt;/a&gt; to join her, &lt;a href=&#34;http://ecgreb.com&#34;&gt;Chuck Greb&lt;/a&gt;, and &lt;a href=&#34;http://arpitonline.com/&#34;&gt;Arpit Mathur&lt;/a&gt; in helping organize the Android Alliance Philadelphia group. I am proud to announce that I have accepted the position as Social Media Director of Android Alliance Philadelphia and that I plan on helping to create an even more engaging community. I am excited to help bring in even more Android enthusiasts, creators, and users with interesting topics and informative events.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>I was recently asked by <a href="http://coreylatislaw.com">Corey Latislaw</a> to join her, <a href="http://ecgreb.com">Chuck Greb</a>, and <a href="http://arpitonline.com/">Arpit Mathur</a> in helping organize the Android Alliance Philadelphia group. I am proud to announce that I have accepted the position as Social Media Director of Android Alliance Philadelphia and that I plan on helping to create an even more engaging community. I am excited to help bring in even more Android enthusiasts, creators, and users with interesting topics and informative events.</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Lightning Talk: Drowning in Images</title>
+      <link>http://localhost:1313/posts/2012-04-25-lightning-talk-drowning-in-images/</link>
+      <pubDate>Wed, 25 Apr 2012 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2012-04-25-lightning-talk-drowning-in-images/</guid>
+      <description>&lt;p&gt;Last night, I gave a lightning talk alongside Matt Smollinger (a myYearbook iOS developer) and other local developers for &lt;a href=&#34;http://www.phillytechweek.com/&#34;&gt;Philly Tech Week 2012&lt;/a&gt;. My talk centered around downloading, caching, and displaying images in an Android application. Check out &lt;a href=&#34;http://localhost:1313/assets/2012/04/Drowning-in-Images-Memory-Management.pdf&#34;&gt;Drowning in Images &amp;ndash; Memory Management&lt;/a&gt; or &lt;a href=&#34;http://dallasgutauckis.com/presentations/&#34; title=&#34;Presentations&#34;&gt;all of my presentations&lt;/a&gt;. You can also watch a video of my presentation &lt;a href=&#34;http://www.youtube.com/watch?v=Zvk9-ndUIac&#34;&gt;on YouTube&lt;/a&gt;. I have to thank &lt;a href=&#34;http://www.androidalliancephilly.com&#34;&gt;Android Alliance Philly&lt;/a&gt; and &lt;a href=&#34;http://phillycocoa.org/&#34;&gt;Philly Cocoaheads&lt;/a&gt;&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>Last night, I gave a lightning talk alongside Matt Smollinger (a myYearbook iOS developer) and other local developers for <a href="http://www.phillytechweek.com/">Philly Tech Week 2012</a>. My talk centered around downloading, caching, and displaying images in an Android application. Check out <a href="/assets/2012/04/Drowning-in-Images-Memory-Management.pdf">Drowning in Images &ndash; Memory Management</a> or <a href="http://dallasgutauckis.com/presentations/" title="Presentations">all of my presentations</a>. You can also watch a video of my presentation <a href="http://www.youtube.com/watch?v=Zvk9-ndUIac">on YouTube</a>. I have to thank <a href="http://www.androidalliancephilly.com">Android Alliance Philly</a> and <a href="http://phillycocoa.org/">Philly Cocoaheads</a></p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Looking at Android Framework source quickly</title>
+      <link>http://localhost:1313/posts/2012-04-25-looking-at-android-source-quickly/</link>
+      <pubDate>Wed, 25 Apr 2012 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2012-04-25-looking-at-android-source-quickly/</guid>
+      <description>&lt;p&gt;Even though I have recent checkouts of the Android source on my local machine, I usually prefer a more convenient and quick way to look at the platform code. Looking through source files on my local machine can often be slow to find the appropriate files and unreasonable to keep open in an IDE all of the time. Instead, I&amp;rsquo;ve been using the copy of the &lt;a href=&#34;https://github.com/android/platform_frameworks_base&#34;&gt;Android source that is hosted on github&lt;/a&gt;.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>Even though I have recent checkouts of the Android source on my local machine, I usually prefer a more convenient and quick way to look at the platform code. Looking through source files on my local machine can often be slow to find the appropriate files and unreasonable to keep open in an IDE all of the time. Instead, I&rsquo;ve been using the copy of the <a href="https://github.com/android/platform_frameworks_base">Android source that is hosted on github</a>.</p>
+<p>Generally, if I&rsquo;m looking for something like &lsquo;How is ListView implemented in Froyo?&rsquo;, I&rsquo;ll open up the source in github at <a href="https://github.com/android/platform_frameworks_base">https://github.com/android/platform_frameworks_base</a>, hit &lsquo;w&rsquo; as the shortcut for switching branches and tags, type in &lsquo;froyo&rsquo; and choose the right branch, hit &rsquo;t&rsquo; as the shortcut for finding a file in the repository, type &lsquo;ListView&rsquo; and hit enter to open the file. Now I have the ListView implementation open in Github and ready to peruse!</p>
+<p>What&rsquo;s nice is that at myYearbook, we have a <a href="https://enterprise.github.com/">github:enterprise</a> instance where we host our own internal code. So in the same way I can figure out how ListViews are implemented in Android, I can also figure out what our current Android versionCode is. Open the internal github to the myYearbook repository, hit &rsquo;t&rsquo;, type in AndroidManifest.xml, and then use my browser&rsquo;s find functionality to look for &lsquo;versionCode&rsquo;. Done.</p>
+<p>Awesome!</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>parcelabler: for implementing Android&#39;&#39;s Parcelable interface</title>
+      <link>http://localhost:1313/posts/2012-01-20-parcelabler-for-implementing-androids-parcelable-interface/</link>
+      <pubDate>Fri, 20 Jan 2012 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2012-01-20-parcelabler-for-implementing-androids-parcelable-interface/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;[Update 2014-09-02]&lt;/strong&gt;: Since this original post, a plugin has been made for Android Studio/IntelliJ by Michał Charmas with contributions from me as well. See &lt;a href=&#34;https://github.com/mcharmas/android-parcelable-intellij-plugin&#34;&gt;android-parcelable-intellij-plugin&lt;/a&gt; for installation instructions.&lt;/p&gt;
+&lt;p&gt;I have created a tool for making the methods needed for implementation of Android&amp;rsquo;s &lt;a href=&#34;http://developer.android.com/reference/android/os/Parcelable.html&#34;&gt;Parcelable&lt;/a&gt; interface within a pre-existing class.&lt;/p&gt;
+&lt;ol start=&#34;0&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;Open the &lt;a href=&#34;http://parcelabler.com&#34;&gt;parcelabler tool&lt;/a&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Copy the full code of the class into the &amp;ldquo;Code&amp;rdquo; text field.&lt;br&gt;
+Example code:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Photo&lt;/span&gt; {  
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#75715e&#34;&gt;/**  
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;    * Caption for the photo  
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;    */&lt;/span&gt;  
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; String caption;  
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; commentCount;  
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;long&lt;/span&gt; photoId;  
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;boolean&lt;/span&gt; isDefault;  
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; Bundle metadata;  
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; CommentHandler commentHandler;  
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Click &amp;ldquo;Build&amp;rdquo; to create the methods&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p><strong>[Update 2014-09-02]</strong>: Since this original post, a plugin has been made for Android Studio/IntelliJ by Michał Charmas with contributions from me as well. See <a href="https://github.com/mcharmas/android-parcelable-intellij-plugin">android-parcelable-intellij-plugin</a> for installation instructions.</p>
+<p>I have created a tool for making the methods needed for implementation of Android&rsquo;s <a href="http://developer.android.com/reference/android/os/Parcelable.html">Parcelable</a> interface within a pre-existing class.</p>
+<ol start="0">
+<li>
+<p>Open the <a href="http://parcelabler.com">parcelabler tool</a>.</p>
+</li>
+<li>
+<p>Copy the full code of the class into the &ldquo;Code&rdquo; text field.<br>
+Example code:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Photo</span> {  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   <span style="color:#75715e">/**  
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    * Caption for the photo  
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    */</span>  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">public</span> String caption;  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> commentCount;  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">long</span> photoId;  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">boolean</span> isDefault;  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">public</span> Bundle metadata;  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">public</span> CommentHandler commentHandler;  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></li>
+<li>
+<p>Click &ldquo;Build&rdquo; to create the methods</p>
+</li>
+<li>
+<p>Copy the methods into your class</p>
+</li>
+<li>
+<p>Add <code>implements Parcelable</code> to your class definition</p>
+</li>
+</ol>
+<p>Now you should hopefully have a working implementation of <code>Parcelable</code> in your class.</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>An adb (Android Debug Bridge) wrapper for installing from a URL, installing to all devices</title>
+      <link>http://localhost:1313/posts/2011-04-07-an-adb-android-debug-bridge-wrapper-for-installing-from-a-url-installing-to-all-devices/</link>
+      <pubDate>Thu, 07 Apr 2011 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2011-04-07-an-adb-android-debug-bridge-wrapper-for-installing-from-a-url-installing-to-all-devices/</guid>
+      <description>&lt;p&gt;At myYearbook, we produce our internal and release candidate builds for all of our &lt;a href=&#34;https://market.android.com/developer?pub=myYearbook.com&#34;&gt;Android applications&lt;/a&gt; using &lt;a href=&#34;http://jenkins-ci.org/&#34;&gt;Jenkins CI&lt;/a&gt;. This allows us to automatically produce builds when changes are pushed to code review (through &lt;a href=&#34;http://code.google.com/p/gerrit/&#34;&gt;gerrit&lt;/a&gt;) as well as when they’re merged upstream. This process is great for keeping integration clean and organized, but it means that QA, product development, and sometimes developers have to download the produced APK from jenkins on to their computer, and then install from the location they downloaded to. In order to expedite this process, I wrote a wrapper script for adb to allow the installation of an APK from a URL.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>At myYearbook, we produce our internal and release candidate builds for all of our <a href="https://market.android.com/developer?pub=myYearbook.com">Android applications</a> using <a href="http://jenkins-ci.org/">Jenkins CI</a>. This allows us to automatically produce builds when changes are pushed to code review (through <a href="http://code.google.com/p/gerrit/">gerrit</a>) as well as when they’re merged upstream. This process is great for keeping integration clean and organized, but it means that QA, product development, and sometimes developers have to download the produced APK from jenkins on to their computer, and then install from the location they downloaded to. In order to expedite this process, I wrote a wrapper script for adb to allow the installation of an APK from a URL.</p>
+<p>To do this, simply change your usage from</p>
+<!-- raw HTML omitted -->
+<p>to use a URL</p>
+<!-- raw HTML omitted -->
+<p>Additionally, use the -a flag to execute your commands on all devices.</p>
+<!-- raw HTML omitted -->
+<p>Get the source: the <a href="https://github.com/myYearbook/adt-plus">adt-plus</a> project on github!</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Fixing constant splash screen on a Motorola Droid 2</title>
+      <link>http://localhost:1313/posts/2011-02-10-fixing-constant-splash-screen-on-a-motorola-droid-2/</link>
+      <pubDate>Thu, 10 Feb 2011 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2011-02-10-fixing-constant-splash-screen-on-a-motorola-droid-2/</guid>
+      <description>&lt;p&gt;If your Motorola Droid 2 is in a state of constant loading (at the startup/splash screen) something has gone awry with your device. Unfortunately, the only way I know to resolve this is to perform a hard reset. This hard reset wipes the operating system of the device and reinstalls it from memory. You will lose your installed apps and have to re-download them. If you purchased apps, as long as you log in to the device with your same email address, you will be able to download the apps again for free.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>If your Motorola Droid 2 is in a state of constant loading (at the startup/splash screen) something has gone awry with your device. Unfortunately, the only way I know to resolve this is to perform a hard reset. This hard reset wipes the operating system of the device and reinstalls it from memory. You will lose your installed apps and have to re-download them. If you purchased apps, as long as you log in to the device with your same email address, you will be able to download the apps again for free.</p>
+<p>To perform a hard reset of the device,</p>
+<ol>
+<li>Completely turn off the device (remove the battery from the device).</li>
+<li>Put the battery back in</li>
+<li>Open the keyboard, and hold the X key and then hold the power button.</li>
+<li>The device should turn on with a triangle with an exclamation mark with an Andy (the green Android mascot)</li>
+<li>Click the Search icon on the keyboard (not the soft key on the screen)</li>
+<li>Use the volume buttons to navigate the menu. Volume up/Volume down for up and down respectively. Navigate to Wipe data/Factory reset.</li>
+<li>Click the Camera button (hard key on the side) to select this option.</li>
+<li>Tap the Menu soft key (on screen) for “OK” to clear the device.</li>
+<li>Once complete, navigate to “Reboot system” and click the Camera button again to accept.</li>
+</ol>
+<p>The device should now reboot and start up properly. You’ll have to re-activate the device and go through the standard set up process, but at least your device works now!</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>XSLTD: It&#39;&#39;s Alive!</title>
+      <link>http://localhost:1313/posts/2010-11-19-xsltd-its-alive/</link>
+      <pubDate>Fri, 19 Nov 2010 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2010-11-19-xsltd-its-alive/</guid>
+      <description>&lt;p&gt;I&amp;rsquo;ve got the daemon running, accepting connections and commands. I&amp;rsquo;ve got a client together and running commands. It all works. More information to come&amp;hellip;.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>I&rsquo;ve got the daemon running, accepting connections and commands. I&rsquo;ve got a client together and running commands. It all works. More information to come&hellip;.</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>XSLTD Alpha: Almost There</title>
+      <link>http://localhost:1313/posts/2010-11-18-xsltd-alpha-almost-there/</link>
+      <pubDate>Thu, 18 Nov 2010 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2010-11-18-xsltd-alpha-almost-there/</guid>
+      <description>&lt;p&gt;The code is almost complete for the alpha version of XSLTD written in Scala. It&amp;rsquo;s not the prettiest bit of code, but it&amp;rsquo;s already accepting memcached protocol commands for XSL/XML storage and retrieval. I&amp;rsquo;m fighting with my HashMap right not to get the data in/out for those values, but it&amp;rsquo;s coming along nicely. If I stick around again tonight and fight through it, I should have something ready to test and maybe even some stats up. Stay tuned&amp;hellip;&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>The code is almost complete for the alpha version of XSLTD written in Scala. It&rsquo;s not the prettiest bit of code, but it&rsquo;s already accepting memcached protocol commands for XSL/XML storage and retrieval. I&rsquo;m fighting with my HashMap right not to get the data in/out for those values, but it&rsquo;s coming along nicely. If I stick around again tonight and fight through it, I should have something ready to test and maybe even some stats up. Stay tuned&hellip;</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Scala: Get character from character code</title>
+      <link>http://localhost:1313/posts/2010-11-15-scala-get-character-from-character-code/</link>
+      <pubDate>Mon, 15 Nov 2010 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2010-11-15-scala-get-character-from-character-code/</guid>
+      <description>&lt;p&gt;Let&amp;rsquo;s say that we are taking in a set of numeric ASCII codes from which we want to get the corresponding character.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-scala&#34; data-lang=&#34;scala&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;val&lt;/span&gt; charCode &lt;span style=&#34;color:#66d9ef&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;45&lt;/span&gt;  
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;val&lt;/span&gt; character &lt;span style=&#34;color:#66d9ef&#34;&gt;=&lt;/span&gt; charCode&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;toChar
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;// Additionally, because of the way scala works, we could just do this, if it&amp;#39;s a pre-determined value  
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;val&lt;/span&gt; character &lt;span style=&#34;color:#66d9ef&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;45.&lt;/span&gt;toChar  
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
+      <content:encoded><![CDATA[<p>Let&rsquo;s say that we are taking in a set of numeric ASCII codes from which we want to get the corresponding character.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-scala" data-lang="scala"><span style="display:flex;"><span><span style="color:#66d9ef">val</span> charCode <span style="color:#66d9ef">=</span> <span style="color:#ae81ff">45</span>  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> character <span style="color:#66d9ef">=</span> charCode<span style="color:#f92672">.</span>toChar
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Additionally, because of the way scala works, we could just do this, if it&#39;s a pre-determined value  
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">val</span> character <span style="color:#66d9ef">=</span> <span style="color:#ae81ff">45.</span>toChar  
+</span></span></code></pre></div>]]></content:encoded>
+    </item>
+    <item>
+      <title>An Excellent Python Cheat-sheet</title>
+      <link>http://localhost:1313/posts/2010-10-28-an-excellent-python-cheat-sheet/</link>
+      <pubDate>Thu, 28 Oct 2010 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2010-10-28-an-excellent-python-cheat-sheet/</guid>
+      <description>&lt;p&gt;I was just browsing through Reddit and found this &lt;a href=&#34;http://i.imgur.com/YQafj.png&#34;&gt;awesome cheat-sheet for Python&lt;/a&gt;. I&amp;rsquo;ve dabbled in Python in the past, and this will certainly be of use in the future. This cheat-sheet gives examples for the majority of basic language constructs.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>I was just browsing through Reddit and found this <a href="http://i.imgur.com/YQafj.png">awesome cheat-sheet for Python</a>. I&rsquo;ve dabbled in Python in the past, and this will certainly be of use in the future. This cheat-sheet gives examples for the majority of basic language constructs.</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Update: Halloween Costume: Raptor Jesus</title>
+      <link>http://localhost:1313/posts/2010-10-28-update-halloween-costume-raptor-jesus/</link>
+      <pubDate>Thu, 28 Oct 2010 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2010-10-28-update-halloween-costume-raptor-jesus/</guid>
+      <description>&lt;p&gt;Two nights ago, I posted about my costume, &lt;a href=&#34;http://shinagle.com/2010/10/26/halloween-costume-raptor-jesus/&#34;&gt;Raptor Jesus&lt;/a&gt;. Since then, I&amp;rsquo;ve painted the full head and gone to work with the costume. I used the female ends of zip ties for teeth, which ended up looking pretty good for the costume. I&amp;rsquo;m glad I thought of that.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;At work, I won funniest costume!&lt;/strong&gt; With the prize ($100 gift card) I broke even on the cost of the costume. Pretty cool to be able to have fun for free. Pictures below.&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>Two nights ago, I posted about my costume, <a href="http://shinagle.com/2010/10/26/halloween-costume-raptor-jesus/">Raptor Jesus</a>. Since then, I&rsquo;ve painted the full head and gone to work with the costume. I used the female ends of zip ties for teeth, which ended up looking pretty good for the costume. I&rsquo;m glad I thought of that.</p>
+<p><strong>At work, I won funniest costume!</strong> With the prize ($100 gift card) I broke even on the cost of the costume. Pretty cool to be able to have fun for free. Pictures below.</p>
+<ul>
+<li><strong>Head, partially painted</strong>:<a href="http://www.flickr.com/photos/55094601@N07/5121619000/in/photostream/">http://www.flickr.com/photos/55094601@N07/5121619000/in/photostream/</a></li>
+<li><strong>Head, no eyes</strong>: <a href="http://www.flickr.com/photos/55094601@N07/5121619094/">http://www.flickr.com/photos/55094601@N07/5121619094/</a></li>
+<li><strong>Head, with eyes<!-- raw HTML omitted -->: <!-- raw HTML omitted --></strong><a href="http://www.flickr.com/photos/55094601@N07/5123364517/">http://www.flickr.com/photos/55094601@N07/5123364517/</a></li>
+<li><strong>Teeth (zip ties)</strong>: <a href="http://www.flickr.com/photos/55094601@N07/5123967668/in/photostream/">http://www.flickr.com/photos/55094601@N07/5123967668/in/photostream/</a></li>
+</ul>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Halloween Costume: Raptor Jesus</title>
+      <link>http://localhost:1313/posts/2010-10-26-halloween-costume-raptor-jesus/</link>
+      <pubDate>Tue, 26 Oct 2010 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2010-10-26-halloween-costume-raptor-jesus/</guid>
+      <description>&lt;p&gt;I&amp;rsquo;ve been hard at work on my Halloween costume: Raptor Jesus. I&amp;rsquo;m going into this knowing that very few people will actually get my costume. At least for them, it will be fantastic.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;I started last night on the different parts that make up the head.&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Materials used: &lt;a href=&#34;http://www.flickr.com/photos/55094601@N07/5112399974/&#34;&gt;http://www.flickr.com/photos/55094601@N07/5112399974/&lt;/a&gt;, &lt;a href=&#34;http://www.flickr.com/photos/55094601@N07/5111800263/&#34;&gt;http://www.flickr.com/photos/55094601@N07/5111800263/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Lower Jaw: &lt;a href=&#34;http://www.flickr.com/photos/55094601@N07/5111954621/&#34;&gt;http://www.flickr.com/photos/55094601@N07/5111954621/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Upper Jaw: &lt;a href=&#34;http://www.flickr.com/photos/55094601@N07/5112365837/&#34;&gt;http://www.flickr.com/photos/55094601@N07/5112365837/&lt;/a&gt;, &lt;a href=&#34;http://www.flickr.com/photos/55094601@N07/5112440353/&#34;&gt;http://www.flickr.com/photos/55094601@N07/5112440353/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Jaws and Head base drying: &lt;a href=&#34;http://www.flickr.com/photos/55094601@N07/5112516377/&#34;&gt;http://www.flickr.com/photos/55094601@N07/5112516377/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Tonight, I pieced them together to make the full head.&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;BAM. It&amp;rsquo;s put together: &lt;a href=&#34;http://www.flickr.com/photos/55094601@N07/5116728772/&#34;&gt;http://www.flickr.com/photos/55094601@N07/5116728772/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;And with more paper mache to cover the tape used and prep for painting (tomorrow): &lt;a href=&#34;http://www.flickr.com/photos/55094601@N07/5116737114/&#34;&gt;http://www.flickr.com/photos/55094601@N07/5116737114/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Can&amp;rsquo;t wait to paint this sucker tomorrow. Paint will be what makes or breaks this project. Wish me luck&amp;hellip;&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>I&rsquo;ve been hard at work on my Halloween costume: Raptor Jesus. I&rsquo;m going into this knowing that very few people will actually get my costume. At least for them, it will be fantastic.</p>
+<p><strong>I started last night on the different parts that make up the head.</strong></p>
+<ul>
+<li>Materials used: <a href="http://www.flickr.com/photos/55094601@N07/5112399974/">http://www.flickr.com/photos/55094601@N07/5112399974/</a>, <a href="http://www.flickr.com/photos/55094601@N07/5111800263/">http://www.flickr.com/photos/55094601@N07/5111800263/</a></li>
+<li>Lower Jaw: <a href="http://www.flickr.com/photos/55094601@N07/5111954621/">http://www.flickr.com/photos/55094601@N07/5111954621/</a></li>
+<li>Upper Jaw: <a href="http://www.flickr.com/photos/55094601@N07/5112365837/">http://www.flickr.com/photos/55094601@N07/5112365837/</a>, <a href="http://www.flickr.com/photos/55094601@N07/5112440353/">http://www.flickr.com/photos/55094601@N07/5112440353/</a></li>
+<li>Jaws and Head base drying: <a href="http://www.flickr.com/photos/55094601@N07/5112516377/">http://www.flickr.com/photos/55094601@N07/5112516377/</a></li>
+</ul>
+<p><strong>Tonight, I pieced them together to make the full head.</strong></p>
+<ul>
+<li>BAM. It&rsquo;s put together: <a href="http://www.flickr.com/photos/55094601@N07/5116728772/">http://www.flickr.com/photos/55094601@N07/5116728772/</a></li>
+<li>And with more paper mache to cover the tape used and prep for painting (tomorrow): <a href="http://www.flickr.com/photos/55094601@N07/5116737114/">http://www.flickr.com/photos/55094601@N07/5116737114/</a></li>
+</ul>
+<p>Can&rsquo;t wait to paint this sucker tomorrow. Paint will be what makes or breaks this project. Wish me luck&hellip;</p>
+]]></content:encoded>
+    </item>
+    <item>
+      <title>Embedded Electronics with Arduino</title>
+      <link>http://localhost:1313/posts/2010-10-24-electronics-engineering-with-arduino/</link>
+      <pubDate>Sun, 24 Oct 2010 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2010-10-24-electronics-engineering-with-arduino/</guid>
+      <description>&lt;p&gt;I&amp;rsquo;ve recently been thinking about how I could get into embedded electronics and came across a cool open-source project called &lt;a href=&#34;http://arduino.cc&#34;&gt;Arduino&lt;/a&gt;.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Arduino is an open-source electronics prototyping platform based on flexible, easy-to-use hardware and software. It&amp;rsquo;s intended for artists, designers, hobbyists, and anyone interested in creating interactive objects or environments.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;That blurb pretty much sums it up. I&amp;rsquo;ve decided to commit some time and effort into this project, so I&amp;rsquo;ve set up a new desk and set of drawers in my bedroom specifically for breadboarding and Arduino programming. I&amp;rsquo;ve also purchased a kit and a book on Arduino from &lt;!-- raw HTML omitted --&gt;sparkfun.com&lt;!-- raw HTML omitted --&gt;.&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;</description>
+      <content:encoded><![CDATA[<p>I&rsquo;ve recently been thinking about how I could get into embedded electronics and came across a cool open-source project called <a href="http://arduino.cc">Arduino</a>.</p>
+<blockquote>
+<p>Arduino is an open-source electronics prototyping platform based on flexible, easy-to-use hardware and software. It&rsquo;s intended for artists, designers, hobbyists, and anyone interested in creating interactive objects or environments.</p></blockquote>
+<p>That blurb pretty much sums it up. I&rsquo;ve decided to commit some time and effort into this project, so I&rsquo;ve set up a new desk and set of drawers in my bedroom specifically for breadboarding and Arduino programming. I&rsquo;ve also purchased a kit and a book on Arduino from <!-- raw HTML omitted -->sparkfun.com<!-- raw HTML omitted -->.<!-- raw HTML omitted --></p>
+]]></content:encoded>
+    </item>
+  </channel>
+</rss>

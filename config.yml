@@ -1,0 +1,66 @@
+baseURL: 'https://dallasgutauckis.github.io/'
+languageCode: 'en-us'
+title: 'Dallas Gutauckis'
+theme: 'PaperMod'
+
+params:
+  defaultTheme: 'PaperMod'
+  ShowShareButtons: true
+  ShowReadingTime: true
+  ShowFullTextinRSS: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowRssButtonInSectionTermList: true
+  ShowWordCount: true
+  ShowFullTextinRSS: true
+  disableFingerprinting: true
+  homeInfoParams:
+    Title: "Welcome"
+    Content: "I'm a programmer by profession & passion. I'm a Staff Android Engineer at Instacart, mostly working to improve our products, engineering processes, and helping people grow."
+  socialIcons:
+    - name: github
+      url: https://github.com/dallasgutauckis
+    - name: stackoverflow
+      url: http://stackoverflow.com/users/407782/dallas
+    - name: linkedin
+      url: http://www.linkedin.com/in/dallasgutauckis
+    - name: threads
+      url: https://www.threads.com/@defnotdallas
+    - name: keybase
+      url: https://keybase.io/dallas
+    - name: flickr
+      url: http://flickr.com/photos/dallasgutauckis
+
+menu:
+  main:
+    - identifier: home
+      name: Home
+      url: /
+      weight: -100
+    - identifier: about
+      name: About
+      url: /about/
+      weight: -90
+    - identifier: resume
+      name: Resume
+      url: /resume/
+      weight: -85
+    - identifier: posts
+      name: Posts
+      url: /posts/
+      weight: -80
+    - identifier: photos
+      name: Photos
+      url: /photos/
+      weight: -70
+    - identifier: contact
+      name: Contact
+      url: /contact/
+      weight: -60
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
