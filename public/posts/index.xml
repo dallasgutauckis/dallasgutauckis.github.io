@@ -86,15 +86,6 @@ Prefer keeping them close to where they&rsquo;re used (e.g. in the same file or 
 ]]></content:encoded>
     </item>
     <item>
-      <title>Testing APIs with Android: An Example</title>
-      <link>http://localhost:1313/posts/2015-04-23-testing-apis-with-android-an-example/</link>
-      <pubDate>Thu, 23 Apr 2015 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/posts/2015-04-23-testing-apis-with-android-an-example/</guid>
-      <description>&lt;p&gt;It&amp;rsquo;s not easy to jump into automated testing. It&amp;rsquo;s certainly not easy to jump into automated testing on Android.&lt;/p&gt;</description>
-      <content:encoded><![CDATA[<p>It&rsquo;s not easy to jump into automated testing. It&rsquo;s certainly not easy to jump into automated testing on Android.</p>
-]]></content:encoded>
-    </item>
-    <item>
       <title>Generate JUnit assertions from your JSON</title>
       <link>http://localhost:1313/posts/2015-02-27-generate-junit-assertions-from-your-json/</link>
       <pubDate>Fri, 27 Feb 2015 00:00:00 +0000</pubDate>
