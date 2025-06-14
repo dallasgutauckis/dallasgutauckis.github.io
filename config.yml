@@ -17,7 +17,7 @@ params:
   disableFingerprinting: true
   profileMode:
     title: "Dallas Gutauckis"
-    subtitle: "I'm a programmer by profession & passion. I'm a Staff Android Engineer at Instacart, mostly working to improve our products, engineering processes, and helping people grow."
+    subtitle: "I'm a programmer by profession & passion. I'm a Staff Mobile Engineer at Instacart, mostly working to improve our products, engineering processes, and helping people grow."
     enabled: true
     imageUrl: "/dallas-square.png"
     buttons:

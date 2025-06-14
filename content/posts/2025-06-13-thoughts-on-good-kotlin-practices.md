@@ -1,5 +1,5 @@
 ---
-title: "Thoughts on good Kotlin practices"
+title: "Thoughts on Better Kotlin Practices"
 date: 2025-06-13
 draft: false
 ---
