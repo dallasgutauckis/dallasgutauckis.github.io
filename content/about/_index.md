@@ -23,6 +23,8 @@ I also enjoy exploring topics in cross-platform development, full-stack awarenes
 
 When I'm not coding, you'll find me scuba diving, practicing underwater photography, or out biking.
 
+![Scuba diving](/dallas-scuba.png)
+
 **You can find me on...**
 
 - [Stack Overflow (dallas)](http://stackoverflow.com/users/407782/dallas)
