@@ -126,24 +126,15 @@
                     <span>Photos</span>
                 </a>
             </li>
-            <li>
-                <a href="http://localhost:1313/contact/" title="Contact">
-                    <span>Contact</span>
-                </a>
-            </li>
         </ul>
     </nav>
 </header>
-<main class="main"> 
-<article class="first-entry home-info">
-    <header class="entry-header">
-        <h1>Welcome</h1>
-    </header>
-    <div class="entry-content">
-        I&rsquo;m a programmer by profession &amp; passion. I&rsquo;m a Staff Android Engineer at Instacart, mostly working to improve our products, engineering processes, and helping people grow.
-    </div>
-    <footer class="entry-footer">
-        <div class="social-icons" >
+<main class="main"><div class="profile">
+    <div class="profile_inner">
+        <img draggable="false" src="http://localhost:1313/dallas-square.png" alt="profile image" title=""
+            height="150" width="150" />
+        <h1>Dallas Gutauckis</h1>
+        <span>I&rsquo;m a programmer by profession &amp; passion. I&rsquo;m a Staff Android Engineer at Instacart, mostly working to improve our products, engineering processes, and helping people grow.</span><div class="social-icons" >
     <a href="https://github.com/dallasgutauckis" target="_blank" rel="noopener noreferrer me"
         title="Github">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -194,155 +185,31 @@
     </a>
 </div>
 
-    </footer>
-</article>
+        <div class="buttons">
+            <a class="button" href="/about/" rel="noopener" title="About">
+                <span class="button-inner">
+                    About
+                </span>
+            </a>
+            <a class="button" href="/resume/" rel="noopener" title="Resume">
+                <span class="button-inner">
+                    Resume
+                </span>
+            </a>
+            <a class="button" href="/posts/" rel="noopener" title="Posts">
+                <span class="button-inner">
+                    Posts
+                </span>
+            </a>
+            <a class="button" href="/photos/" rel="noopener" title="Photos">
+                <span class="button-inner">
+                    Photos
+                </span>
+            </a>
+        </div>
+    </div>
+</div>
 
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Thoughts on good Kotlin practices
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>I recently joined a new company to continue my career in Android development and leadership. Part of that is seeing how people code, what the team has found valuable in the past for best practices, and sprinkling some of my own ideas in as time goes on.
-I thought I’d share some of my thoughts here so that others can see these and consider them as well.
-Kotlin Best Practices Only use destructuring on positional classes Destructuring can be a really clean way to unpack data, but it should be reserved for data types where the order of fields makes intuitive sense—namely, positional classes like Pair, Triple, or when splitting a string, e.g.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2025-06-13 00:00:00 +0000 UTC'>June 13, 2025</span>&nbsp;·&nbsp;4 min&nbsp;·&nbsp;794 words</footer>
-  <a class="entry-link" aria-label="post link to Thoughts on good Kotlin practices" href="http://localhost:1313/posts/2025-06-13-thoughts-on-good-kotlin-practices/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Generate JUnit assertions from your JSON
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>Got some JSON you want to build into a model and test?
-It can be pretty tedious writing all of that code. Instead, why not generate the assert* code automatically? I’ve been writing code manually for a while now and finally decided to build something to write that boilerplate code for me.
-I’ve put up a live version for anyone to use, as well as open-sourced it on GitHub. Let me know what you think!
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2015-02-27 00:00:00 +0000 UTC'>February 27, 2015</span>&nbsp;·&nbsp;1 min&nbsp;·&nbsp;110 words</footer>
-  <a class="entry-link" aria-label="post link to Generate JUnit assertions from your JSON" href="http://localhost:1313/posts/2015-02-27-generate-junit-assertions-from-your-json/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Android Animations: Bring Your Application to Life
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>My Animation talk from Droidcon New York City 2014
-Slides on SpeakerDeck Original keynote with animations Sample app for camera distance tip Video:
-</p>
-  </div>
-  <footer class="entry-footer"><span title='2015-02-02 00:00:00 +0000 UTC'>February 2, 2015</span>&nbsp;·&nbsp;1 min&nbsp;·&nbsp;23 words</footer>
-  <a class="entry-link" aria-label="post link to Android Animations: Bring Your Application to Life" href="http://localhost:1313/posts/2015-02-02-android-animations-bring-your-application-to-life/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Wi-Fi issues on Moto X 2nd Gen
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>I received my 2nd Gen Moto X today. During setup, I attempted to connect to our company’s Wi-Fi network to no avail. I was able to connect to another public Wi-Fi in the area but for some reason not to our typical Cisco WAP setup at work. All of the other devices we have at work are able to connect to the network, so I’m not sure what is going on.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2014-09-26 00:00:00 +0000 UTC'>September 26, 2014</span>&nbsp;·&nbsp;4 min&nbsp;·&nbsp;754 words</footer>
-  <a class="entry-link" aria-label="post link to Wi-Fi issues on Moto X 2nd Gen" href="http://localhost:1313/posts/2014-09-26-wi-fi-issues-on-moto-x-2nd-gen/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Android Animation &amp;mdash; Bringing Your Applications to Life @ Droidcon NYC 2014
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>Last weekend, I gave a talk on animation on Android at the innaugural Droidcon NYC (2014). The talk was well-received and I got some tough questions. Nonetheless, I’m happy I did it and I’m posting the presentation for your viewing pleasure. I highly recommend checking out the actual Keynote file (linked to from the Speakerdeck site) if you can as it includes the videos/animations as opposed to just static images.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2014-09-25 00:00:00 +0000 UTC'>September 25, 2014</span>&nbsp;·&nbsp;1 min&nbsp;·&nbsp;87 words</footer>
-  <a class="entry-link" aria-label="post link to Android Animation &mdash; Bringing Your Applications to Life @ Droidcon NYC 2014" href="http://localhost:1313/posts/2014-09-25-android-animation-bringing-your-applications-to-life-droidcon-nyc-2014/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Android Authority: Best resources for Android development
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p> Whether you’re a seasoned professional or just beginning with Android development, this list of resources (including tools, libraries, and blogs) is useful for any developer or team on just about any project, big or small.
-Read more: Best resources for Android development
-</p>
-  </div>
-  <footer class="entry-footer"><span title='2014-05-11 00:00:00 +0000 UTC'>May 11, 2014</span>&nbsp;·&nbsp;1 min&nbsp;·&nbsp;42 words</footer>
-  <a class="entry-link" aria-label="post link to Android Authority: Best resources for Android development" href="http://localhost:1313/posts/2014-05-11-android-authority-best-resources-for-android-development/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Listing connected Android devices with OS version and model
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>I was wandering down the path of trying to associate the myriad of devices connected to my machine for debugging. I wanted to know very easily what the devices’ model and OS version were without having to manual check by disconnecting and reconnecting devices and using the process of elimination.
-One way to see this information is using a special flag with adb:
-adb devices -l This yields something like
-List of devices attached HT16JHX24920 device usb:14130000 015d2a506750081b device usb:14120000 product:nakasi model:Nexus_7 device:grouper 4d005e148cc950eb device usb:14112000 product:ja3gub model:GT_I9500 device:ja3g 0A3BC06A11010002 device usb:14140000 e08b84fd device usb:14113000 HT346W912280 device usb:14114000 Which as you can probably tell doesn’t give us all of the information we want, nor does it seem to work on every device.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2014-04-09 00:00:00 +0000 UTC'>April 9, 2014</span>&nbsp;·&nbsp;1 min&nbsp;·&nbsp;208 words</footer>
-  <a class="entry-link" aria-label="post link to Listing connected Android devices with OS version and model" href="http://localhost:1313/posts/2014-04-09-listing-connected-android-devices-with-os-version-and-model/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Making Borders for Views Using layer-list
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>Android is full of many ways to do things differently. One of those things happens to be making a border for a View.
-The common approach I’ve seen is for developers to have two Views. One View is the View with a background (be it solid, bitmap, or otherwise). The other View acts as a border, typically either 1px or 1dp in width or height, the other side matching the height or width of the other View. Although this is certainly an easy approach, at adds more to your layout than is likely necessary.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2014-03-20 00:00:00 +0000 UTC'>March 20, 2014</span>&nbsp;·&nbsp;2 min&nbsp;·&nbsp;269 words</footer>
-  <a class="entry-link" aria-label="post link to Making Borders for Views Using layer-list" href="http://localhost:1313/posts/2014-03-20-making-borders-for-views-using-layer-list/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">A Better Parcelabler...
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>A little bit ago (okay, a long time ago) I wrote a blog post about a tool I wrote for creating Parcelable implementations for Android. At time of writing, I knew it wasn’t a great solution, but that at least it worked… Since then, I constantly put off writing what I thought would be a better solution: an IDE plugin.
-So last week, I embarked upon the journey of making a plugin for Android Studio. I immediately saw that something existed, but it was a bit older, and not quite as feature-packed as I had hoped. So, I took it upon myself to make some enhancements and submit a pull request.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2014-02-10 00:00:00 +0000 UTC'>February 10, 2014</span>&nbsp;·&nbsp;1 min&nbsp;·&nbsp;147 words</footer>
-  <a class="entry-link" aria-label="post link to A Better Parcelabler..." href="http://localhost:1313/posts/2014-02-10-a-better-parcelabler/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Moving to New Opportunities, New Things, New York...
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>Over six-and-a-half years ago, I joined a small startup, MeetMe (then myYearbook), of around 20 or 30 employees in the small, artsy town of New Hope, PA. Over the years, MeetMe provided me with many opportunities to grow and learn, allowing me to transition from a full stack web engineer to an Android engineer. I truly am grateful not only for the opportunities that I’ve been given, but also for the team that I’ve gotten to work with.
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2014-02-04 00:00:00 +0000 UTC'>February 4, 2014</span>&nbsp;·&nbsp;1 min&nbsp;·&nbsp;172 words</footer>
-  <a class="entry-link" aria-label="post link to Moving to New Opportunities, New Things, New York..." href="http://localhost:1313/posts/2014-02-04-one-new-place-to-another/"></a>
-</article>
-<footer class="page-footer">
-  <nav class="pagination">
-    <a class="next" href="http://localhost:1313/page/2/">Next&nbsp;&nbsp;»
-    </a>
-  </nav>
-</footer>
     </main>
     
 <footer class="footer">

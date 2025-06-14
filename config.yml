@@ -15,9 +15,21 @@ params:
   ShowWordCount: true
   ShowFullTextinRSS: true
   disableFingerprinting: true
-  homeInfoParams:
-    Title: "Welcome"
-    Content: "I'm a programmer by profession & passion. I'm a Staff Android Engineer at Instacart, mostly working to improve our products, engineering processes, and helping people grow."
+  profileMode:
+    title: "Dallas Gutauckis"
+    subtitle: "I'm a programmer by profession & passion. I'm a Staff Android Engineer at Instacart, mostly working to improve our products, engineering processes, and helping people grow."
+    enabled: true
+    imageUrl: "/dallas-square.png"
+    buttons:
+      - name: "About"
+        url: "/about/"
+      - name: "Resume"
+        url: "/resume/"
+      - name: "Posts"
+        url: "/posts/"
+      - name: "Photos"
+        url: "/photos/"
+
   socialIcons:
     - name: github
       url: https://github.com/dallasgutauckis
@@ -54,10 +66,6 @@ menu:
       name: Photos
       url: /photos/
       weight: -70
-    - identifier: contact
-      name: Contact
-      url: /contact/
-      weight: -60
 
 outputs:
   home:

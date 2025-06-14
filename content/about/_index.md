@@ -4,7 +4,7 @@ date: 2010-10-24T05:54:24-04:00
 draft: false
 ---
 
-![Dallas Gutauckis (that's me!)](/assets/dallas_620.jpg)
+![Dallas Gutauckis (that's me!)](/dallas_620.jpg)
 
 I'm a programmer by profession as well as by passion.
 
