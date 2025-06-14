@@ -8,14 +8,14 @@ draft: false
 
 I'm a programmer by profession as well as by passion.
 
-I am the Mobile Engineering Lead at [SeatGeek](https://seatgeek.com), mostly working to improve our products, engineering processes, and helping people grow.
+I am currently a Staff Android Engineer at [Instacart](https://instacart.com), focusing on improving mobile products, engineering processes, and helping people grow.
 
-As a matter of hobby I tend to enjoy photography, biking, and hockey.
+In my free time, I enjoy scuba diving, underwater photography, and biking.
 
 **You can find me on...**
 
  * [Stack Overflow (dallas)](http://stackoverflow.com/users/407782/dallas)
  * [Github (dallasgutauckis)](https://github.com/dallasgutauckis)
  * [Twitter (dallasgutauckis)](https://twitter.com/dallasgutauckis)
- * [LinkedIn(dallasgutauckis)](http://www.linkedin.com/in/dallasgutauckis)
+ * [LinkedIn (dallasgutauckis)](http://www.linkedin.com/in/dallasgutauckis)
  * [Keybase (dallas)](https://keybase.io/dallas) 
