@@ -117,3 +117,33 @@ when (state) {
 ```
 
 If you add a new subclass to `UiState`, the compiler will alert you to update all relevant `when` statements. This helps prevent subtle bugs and ensures your code stays robust as your models evolve.
+
+### Choosing between `let`, `apply`, `run`, `also`, and `with`
+
+Kotlin provides several scope functions—`let`, `apply`, `run`, `also`, and `with`—each with its own use case. Choosing the right one improves code clarity and intent:
+
+- **`let`**: Use when you want to execute a block with the object as `it` and return the block's result. Common for null checks and chaining operations.
+  ```kotlin
+  val result = value?.let { doSomethingWith(it) }
+  ```
+- **`apply`**: Use when you want to configure an object and return the object itself. The receiver is `this`.
+  ```kotlin
+  val paint = Paint().apply { color = Color.RED; strokeWidth = 2f }
+  ```
+- **`run`**: Use when you want to execute a block with the object as `this` and return the block's result. Good for combining object configuration and computation.
+  ```kotlin
+  val length = myString.run { trim().length }
+  ```
+- **`also`**: Use for performing additional actions (like logging or debugging) with the object as `it`, returning the object itself.
+  ```kotlin
+  val list = mutableListOf("a").also { println("List created: $it") }
+  ```
+- **`with`**: Use when you want to operate on a non-null object without returning a result, using `this` as the receiver.
+  ```kotlin
+  with(myView) {
+      alpha = 0.5f
+      visibility = View.VISIBLE
+  }
+  ```
+
+For more details and examples, see the official Kotlin documentation: [Scope Functions](https://kotlinlang.org/docs/scope-functions.html)
